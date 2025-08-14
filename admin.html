@@ -697,6 +697,8 @@
                 return;
             }
             
+            console.log('Adding event with data:', {title, type, date, time, description, image, shopLink});
+            
             // Check if date is not too far in the past
             const eventDate = new Date(date + 'T' + time);
             const now = new Date();
