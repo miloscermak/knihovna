@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Knihovna Čermáka a Staňka</title>
+    <title>Admin - Knihovna Čermáka a Staňka (v2024.1)</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -468,7 +468,7 @@
         // Supabase configuration
         const SUPABASE_URL = 'https://eyfgtagudbvzorrdntdf.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5Zmd0YWd1ZGJ2em9ycmRudGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4MzEwMDMsImV4cCI6MjA3MDQwNzAwM30.uw5k8YWuIzM2Q1e8dzwSKXJBlA_wViVdAvtue6Qx0A0';
-        const ADMIN_PASSWORD = 'NightyNight99'; // Updated
+        const ADMIN_PASSWORD = 'knihovna2024';
         
         // Initialize Supabase client with error handling
         let supabase;
@@ -531,6 +531,10 @@
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const password = document.getElementById('adminPassword').value;
+            
+            console.log('Zadané heslo:', password);
+            console.log('Očekávané heslo:', ADMIN_PASSWORD);
+            console.log('Shoda:', password === ADMIN_PASSWORD);
             
             if (password === ADMIN_PASSWORD) {
                 sessionStorage.setItem('knihovna_admin_auth', 'true');
