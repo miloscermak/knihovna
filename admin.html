@@ -532,10 +532,6 @@
             e.preventDefault();
             const password = document.getElementById('adminPassword').value;
             
-            console.log('Zadané heslo:', password);
-            console.log('Očekávané heslo:', ADMIN_PASSWORD);
-            console.log('Shoda:', password === ADMIN_PASSWORD);
-            
             if (password === ADMIN_PASSWORD) {
                 sessionStorage.setItem('knihovna_admin_auth', 'true');
                 isAuthenticated = true;
@@ -1073,7 +1069,6 @@
                     showAlert('danger', 'Chyba při mazání fotky: ' + error.message, 'galleryError');
                 }
             }
-        }
         }
 
         // Initialize admin panel
