@@ -19,7 +19,7 @@ Web je dostupný na: [https://miloscermak.github.io/knihovna/](https://miloscerm
 
 Admin panel je dostupný na: [https://miloscermak.github.io/knihovna/admin.html](https://miloscermak.github.io/knihovna/admin.html)
 
-**Heslo:** `admin123`
+**Heslo:** `NightyNight99`
 
 ### Admin funkce:
 - ➕ Přidávání událostí s fotkami a eshop linky
