@@ -95,28 +95,18 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="relative text-white py-20 min-h-screen flex items-center" id="home">
+    <section class="relative text-white py-16" id="home" style="height: 70vh;">
         <!-- Background Image -->
         <div class="absolute inset-0 z-0">
             <img src="uvodni.jpeg" alt="Knihovna Čermáka a Staňka" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-black bg-opacity-60"></div>
         </div>
         
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div class="text-center">
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex items-center">
+            <div class="text-center w-full">
                 <p class="text-xl md:text-3xl mb-8 text-white max-w-4xl mx-auto leading-relaxed font-light">
                     Jedinečný kulturní prostor v Holešovicích. Najdete v něm knihy, Čermáka i Staňka. Minimálně jedno z toho. A taky standup, natáčení podcastů, Bookclub, workshopy nebo třeba kvízy. Máme nejlepší popcorn v Praze, belgická piva, kvalitní whisky i mnoho dalšího.
                 </p>
-                
-                <div class="bg-red-600 text-white p-6 rounded-lg mb-8 max-w-4xl mx-auto" id="featuredEvent">
-                    <h2 class="text-2xl font-bold mb-2">Aktuální akce</h2>
-                    <p class="text-lg">
-                        Připojte se k našim pravidelným debatám každý čtvrtek ve 20:00
-                    </p>
-                    <button class="mt-4 bg-white text-red-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors duration-200">
-                        Zobrazit program
-                    </button>
-                </div>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="#program" class="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-all duration-200 transform hover:scale-105">
@@ -126,6 +116,30 @@
                         O klubu
                     </a>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program Section -->
+    <section id="program" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-black mb-4">
+                    Program
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Aktuální akce a události v našem klubu
+                </p>
+            </div>
+            
+            <div id="eventsList" class="space-y-8">
+                <!-- Events will be loaded here -->
+            </div>
+            
+            <div class="text-center mt-12">
+                <button class="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium">
+                    Zobrazit všechny akce
+                </button>
             </div>
         </div>
     </section>
@@ -202,30 +216,6 @@
                         <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 150'><rect fill='%23b0b0b0'/><text x='50%' y='50%' text-anchor='middle' font-size='14' fill='%23999'>Bar</text></svg>" alt="Bar" class="rounded-lg shadow-md">
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Program Section -->
-    <section id="program" class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-black mb-4">
-                    Program
-                </h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    Aktuální akce a události v našem klubu
-                </p>
-            </div>
-            
-            <div id="eventsList" class="space-y-8">
-                <!-- Events will be loaded here -->
-            </div>
-            
-            <div class="text-center mt-12">
-                <button class="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium">
-                    Zobrazit všechny akce
-                </button>
             </div>
         </div>
     </section>
@@ -472,6 +462,30 @@
                         <textarea id="aboutText" rows="6" maxlength="1000" placeholder="Upravte text sekce O nás..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"></textarea>
                     </div>
                     <button class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium" onclick="saveAboutText()">Uložit změny</button>
+                </div>
+            </div>
+
+            <!-- Edit Contact Section -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Upravit kontaktní údaje</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
+                        <input type="tel" id="contactPhone" placeholder="+420 234 567 890" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="contactEmail" placeholder="info@knihovnacs.cz" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Adresa</label>
+                        <input type="text" id="contactAddress" placeholder="Národní 28, 110 00 Praha 1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Otevírací doba</label>
+                        <textarea id="openingHours" rows="3" placeholder="Po-Pá: 18:00-24:00..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"></textarea>
+                    </div>
+                    <button class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium" onclick="saveContactInfo()">Uložit kontaktní údaje</button>
                 </div>
             </div>
         </div>
@@ -829,7 +843,7 @@
         }
 
         // Save about text
-        function saveAboutText() {
+        async function saveAboutText() {
             const aboutText = document.getElementById('aboutText').value.trim();
             
             if (!aboutText) {
@@ -837,15 +851,97 @@
                 return;
             }
             
-            localStorage.setItem('aboutText', aboutText);
+            try {
+                // Try to save to Supabase first
+                const { error } = await supabase
+                    .from('settings')
+                    .upsert([{
+                        key: 'about_main_text',
+                        value: aboutText
+                    }]);
+                    
+                if (error) {
+                    console.log('Supabase save failed, using localStorage:', error);
+                    localStorage.setItem('aboutText', aboutText);
+                } else {
+                    localStorage.setItem('aboutText', aboutText);
+                }
+                
+                // Update the about section
+                const aboutMainText = document.getElementById('aboutMainText');
+                if (aboutMainText) {
+                    aboutMainText.textContent = aboutText;
+                }
+                
+                alert('Text sekce "O nás" byl úspěšně uložen!');
+                
+            } catch (error) {
+                console.error('Error saving about text:', error);
+                localStorage.setItem('aboutText', aboutText);
+                
+                // Update the about section
+                const aboutMainText = document.getElementById('aboutMainText');
+                if (aboutMainText) {
+                    aboutMainText.textContent = aboutText;
+                }
+                
+                alert('Text byl uložen lokálně (Supabase nedostupný).');
+            }
+        }
+
+        // Save contact information
+        async function saveContactInfo() {
+            const phone = document.getElementById('contactPhone').value.trim();
+            const email = document.getElementById('contactEmail').value.trim();
+            const address = document.getElementById('contactAddress').value.trim();
+            const hours = document.getElementById('openingHours').value.trim();
             
-            // Update the about section - replace first paragraph content
-            const firstParagraph = document.querySelector('.about-text p');
-            if (firstParagraph) {
-                firstParagraph.textContent = aboutText;
+            if (!phone && !email && !address && !hours) {
+                alert('Vyplňte alespoň jeden údaj.');
+                return;
             }
             
-            alert('Text sekce "O nás" byl úspěšně uložen!');
+            try {
+                // Prepare settings for Supabase
+                const settings = [];
+                if (phone) settings.push({ key: 'contact_phone', value: phone });
+                if (email) settings.push({ key: 'contact_email', value: email });
+                if (address) settings.push({ key: 'contact_address', value: address });
+                if (hours) settings.push({ key: 'opening_hours', value: hours });
+                
+                // Try to save to Supabase
+                const { error } = await supabase
+                    .from('settings')
+                    .upsert(settings);
+                    
+                if (error) {
+                    console.log('Supabase save failed, using localStorage:', error);
+                    if (phone) localStorage.setItem('contact_phone', phone);
+                    if (email) localStorage.setItem('contact_email', email);
+                    if (address) localStorage.setItem('contact_address', address);
+                    if (hours) localStorage.setItem('opening_hours', hours);
+                } else {
+                    if (phone) localStorage.setItem('contact_phone', phone);
+                    if (email) localStorage.setItem('contact_email', email);
+                    if (address) localStorage.setItem('contact_address', address);
+                    if (hours) localStorage.setItem('opening_hours', hours);
+                }
+                
+                // Update contact section on the page
+                await loadAllContent();
+                
+                alert('Kontaktní údaje byly úspěšně uloženy!');
+                
+            } catch (error) {
+                console.error('Error saving contact info:', error);
+                if (phone) localStorage.setItem('contact_phone', phone);
+                if (email) localStorage.setItem('contact_email', email);
+                if (address) localStorage.setItem('contact_address', address);
+                if (hours) localStorage.setItem('opening_hours', hours);
+                
+                await loadAllContent();
+                alert('Kontaktní údaje byly uloženy lokálně (Supabase nedostupný).');
+            }
         }
 
         // Gallery management functions
@@ -1061,9 +1157,15 @@
                     data.forEach(setting => {
                         switch(setting.key) {
                             case 'about_text':
+                            case 'about_main_text':
                                 const aboutMainText = document.getElementById('aboutMainText');
                                 if (aboutMainText) {
                                     aboutMainText.textContent = setting.value;
+                                }
+                                // Also populate admin form
+                                const aboutTextAdmin = document.querySelector('#adminPanel textarea[id="aboutText"]');
+                                if (aboutTextAdmin) {
+                                    aboutTextAdmin.value = setting.value;
                                 }
                                 break;
                                 
@@ -1075,30 +1177,50 @@
                                 break;
                                 
                             case 'opening_hours':
-                                const openingHours = document.getElementById('openingHours');
-                                if (openingHours) {
-                                    openingHours.innerHTML = '<strong>' + setting.value.replace('<br>', '</strong><br><strong>') + '</strong>';
+                                const openingHoursDisplay = document.getElementById('openingHours');
+                                if (openingHoursDisplay) {
+                                    openingHoursDisplay.innerHTML = '<strong>' + setting.value.replace('<br>', '</strong><br><strong>') + '</strong>';
+                                }
+                                // Also populate admin form
+                                const openingHoursAdmin = document.querySelector('#adminPanel textarea[id="openingHours"]');
+                                if (openingHoursAdmin) {
+                                    openingHoursAdmin.value = setting.value;
                                 }
                                 break;
                                 
                             case 'contact_address':
-                                const contactAddress = document.getElementById('contactAddress');
-                                if (contactAddress) {
-                                    contactAddress.innerHTML = setting.value;
+                                const contactAddressDisplay = document.getElementById('contactAddress');
+                                if (contactAddressDisplay) {
+                                    contactAddressDisplay.innerHTML = setting.value;
+                                }
+                                // Also populate admin form
+                                const contactAddressAdmin = document.querySelector('#adminPanel input[id="contactAddress"]');
+                                if (contactAddressAdmin) {
+                                    contactAddressAdmin.value = setting.value;
                                 }
                                 break;
                                 
                             case 'contact_email':
-                                const contactEmail = document.getElementById('contactEmail');
-                                if (contactEmail) {
-                                    contactEmail.textContent = setting.value;
+                                const contactEmailDisplay = document.getElementById('contactEmail');
+                                if (contactEmailDisplay) {
+                                    contactEmailDisplay.textContent = setting.value;
+                                }
+                                // Also populate admin form
+                                const contactEmailAdmin = document.querySelector('#adminPanel input[id="contactEmail"]');
+                                if (contactEmailAdmin) {
+                                    contactEmailAdmin.value = setting.value;
                                 }
                                 break;
                                 
                             case 'contact_phone':
-                                const contactPhone = document.getElementById('contactPhone');
-                                if (contactPhone) {
-                                    contactPhone.textContent = setting.value;
+                                const contactPhoneDisplay = document.getElementById('contactPhone');
+                                if (contactPhoneDisplay) {
+                                    contactPhoneDisplay.textContent = setting.value;
+                                }
+                                // Also populate admin form
+                                const contactPhoneAdmin = document.querySelector('#adminPanel input[id="contactPhone"]');
+                                if (contactPhoneAdmin) {
+                                    contactPhoneAdmin.value = setting.value;
                                 }
                                 break;
                         }
