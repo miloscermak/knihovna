@@ -345,18 +345,7 @@
                         <label>Název události *</label>
                         <input type="text" id="eventTitle" required maxlength="100" placeholder="Zadejte název události...">
                     </div>
-                    <div class="form-group">
-                        <label>Typ události *</label>
-                        <select id="eventType" required>
-                            <option value="">-- Vyberte typ události --</option>
-                            <option value="cteni">Autorské čtení</option>
-                            <option value="diskuze">Diskuze</option>
-                            <option value="workshop">Workshop</option>
-                            <option value="film">Film</option>
-                            <option value="standup">Standup</option>
-                            <option value="kviz">Kvíz</option>
-                        </select>
-                    </div>
+                    <!-- Typ události odstraněn pro zjednodušení -->
                     <div class="form-group">
                         <label>Datum *</label>
                         <input type="date" id="eventDate" required>
@@ -627,21 +616,13 @@
             eventsList.innerHTML = sortedEvents.map(event => {
                 const eventDate = new Date(event.date + 'T' + event.time);
                 const isUpcoming = eventDate > new Date();
-                const typeLabels = {
-                    'cteni': 'Autorské čtení',
-                    'diskuze': 'Diskuze',
-                    'workshop': 'Workshop',
-                    'film': 'Film',
-                    'standup': 'Standup',
-                    'kviz': 'Kvíz'
-                };
                 
                 return `
                     <div class="event-item">
                         <div class="event-info">
                             <h4>${event.title} ${isUpcoming ? '' : '<small style="color: var(--gray-medium);">(proběhlo)</small>'}</h4>
                             <div class="event-meta">
-                                ${typeLabels[event.type]} • ${new Date(event.date).toLocaleDateString('cs-CZ')} ${event.time}
+                                ${new Date(event.date).toLocaleDateString('cs-CZ')} • ${event.time}
                             </div>
                         </div>
                         <div class="btn-group">
@@ -684,7 +665,7 @@
             if (!isAuthenticated) return;
             
             const title = document.getElementById('eventTitle').value.trim();
-            const type = document.getElementById('eventType').value;
+            const type = 'event'; // Výchozí typ
             const date = document.getElementById('eventDate').value;
             const time = document.getElementById('eventTime').value;
             const description = document.getElementById('eventDescription').value.trim();
@@ -692,7 +673,7 @@
             const shopLink = document.getElementById('eventShopLink').value.trim();
             
             // Validation
-            if (!title || !type || !date || !time || !description) {
+            if (!title || !date || !time || !description) {
                 showAlert('danger', 'Prosím vyplňte všechna povinná pole.', 'eventError');
                 return;
             }
@@ -849,7 +830,7 @@
             
             // Populate form with event data
             document.getElementById('eventTitle').value = event.title;
-            document.getElementById('eventType').value = event.type;
+            // eventType field removed
             document.getElementById('eventDate').value = event.date;
             document.getElementById('eventTime').value = event.time;
             document.getElementById('eventDescription').value = event.description;
