@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Knihovna Čermáka a Staňka</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-black: #1a1a1a;
+            --primary-white: #ffffff;
+            --gray-light: #f5f5f5;
+            --gray-medium: #888888;
+            --gray-dark: #333333;
+            --accent: #c9a961;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--primary-black);
+            background: var(--gray-light);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--primary-white);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--primary-black);
+            color: var(--primary-white);
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 300;
+        }
+
+        .back-link {
+            color: var(--primary-white);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            background: var(--primary-white);
+            color: var(--primary-black);
+        }
+
+        .content {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .section {
+            background: var(--gray-light);
+            padding: 2rem;
+            border-radius: 8px;
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            color: var(--primary-black);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-dark);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            background: var(--primary-white);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--primary-white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-black);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--primary-white);
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .stats {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--primary-white);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid var(--accent);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            color: var(--gray-medium);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .events-list {
+            max-height: 400px;
+            overflow-y: auto;
+            background: var(--primary-white);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .event-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-light);
+            transition: var(--transition);
+        }
+
+        .event-item:hover {
+            background: var(--gray-light);
+        }
+
+        .event-item:last-child {
+            border-bottom: none;
+        }
+
+        .event-info h4 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .event-meta {
+            color: var(--gray-medium);
+            font-size: 0.9rem;
+        }
+
+        .subscribers-list {
+            max-height: 300px;
+            overflow-y: auto;
+            background: var(--primary-white);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .subscriber-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .subscriber-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form -->
+    <div id="loginContainer" class="container" style="max-width: 400px; margin-top: 10vh;">
+        <div class="header" style="text-align: center;">
+            <h1>Přihlášení</h1>
+        </div>
+        <div style="padding: 2rem;">
+            <div class="alert alert-danger" id="loginError"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Heslo administrátora</label>
+                    <input type="password" id="adminPassword" required placeholder="Zadejte heslo..." autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Přihlásit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminContainer" class="container" style="display: none;">
+        <div class="header">
+            <h1>Administrace Knihovny Č&S</h1>
+            <div>
+                <button class="btn btn-danger" onclick="logout()" style="margin-right: 1rem;">Odhlásit</button>
+                <a href="knihovna.html" class="back-link">← Zpět na web</a>
+            </div>
+        </div>
+
+        <div class="content" id="adminContent">
+            <!-- Statistics -->
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="eventCount">0</div>
+                    <div class="stat-label">Událostí</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="subscriberCount">0</div>
+                    <div class="stat-label">Přihlášení</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="upcomingCount">0</div>
+                    <div class="stat-label">Nadcházející</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="galleryCount">0</div>
+                    <div class="stat-label">Fotek v galerii</div>
+                </div>
+            </div>
+
+            <!-- Add Event Section -->
+            <div class="section">
+                <h2>Přidat událost</h2>
+                <div class="alert alert-success" id="eventAlert"></div>
+                <div class="alert alert-danger" id="eventError"></div>
+                
+                <form id="eventForm">
+                    <div class="form-group">
+                        <label>Název události *</label>
+                        <input type="text" id="eventTitle" required maxlength="100" placeholder="Zadejte název události...">
+                    </div>
+                    <div class="form-group">
+                        <label>Typ události *</label>
+                        <select id="eventType" required>
+                            <option value="">-- Vyberte typ události --</option>
+                            <option value="cteni">Autorské čtení</option>
+                            <option value="diskuze">Diskuze</option>
+                            <option value="workshop">Workshop</option>
+                            <option value="film">Film</option>
+                            <option value="standup">Standup</option>
+                            <option value="kviz">Kvíz</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Datum *</label>
+                        <input type="date" id="eventDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Čas *</label>
+                        <input type="time" id="eventTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Popis události *</label>
+                        <textarea id="eventDescription" required maxlength="500" placeholder="Popište událost, její program a další důležité informace..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Fotka události (URL)</label>
+                        <input type="url" id="eventImage" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label>Link na eshop/vstupenky</label>
+                        <input type="url" id="eventShopLink" placeholder="https://obchod.example.com/udalost">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Přidat událost</button>
+                </form>
+            </div>
+
+            <!-- Manage Events Section -->
+            <div class="section">
+                <h2>Správa událostí</h2>
+                <div class="events-list" id="eventsList">
+                    <!-- Events will be populated here -->
+                </div>
+            </div>
+
+            <!-- Edit Content Section -->
+            <div class="section" style="grid-column: 1 / -1;">
+                <h2>Úprava obsahu webu</h2>
+                <div class="alert alert-success" id="contentAlert"></div>
+                <div class="alert alert-danger" id="contentError"></div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <div class="form-group">
+                            <label>Hlavní text "O nás"</label>
+                            <textarea id="aboutText" rows="4" maxlength="1000" placeholder="Hlavní popis knihovny..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Popis aktivit</label>
+                            <textarea id="aboutDescription" rows="3" maxlength="500" placeholder="Co pořádáte..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Otevírací doba</label>
+                            <textarea id="openingHours" rows="2" maxlength="200" placeholder="Po–Pá: 10:00–21:00<br>So–Ne: 11:00–19:00"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label>Adresa</label>
+                            <textarea id="contactAddress" rows="2" maxlength="200" placeholder="Ulice<br>PSČ Město"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="contactEmail" maxlength="100" placeholder="email@knihovna.cz">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Telefon</label>
+                            <input type="tel" id="contactPhone" maxlength="50" placeholder="+420 123 456 789">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="saveAllContent()" style="width: 200px; margin-top: 1rem;">Uložit vše</button>
+            </div>
+
+            <!-- Gallery Management -->
+            <div class="section">
+                <h2>Správa galerie</h2>
+                <div class="alert alert-success" id="galleryAlert"></div>
+                <div class="alert alert-danger" id="galleryError"></div>
+                
+                <div class="form-group">
+                    <label>URL obrázku</label>
+                    <input type="url" id="galleryImageUrl" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="form-group">
+                    <label>Popis obrázku</label>
+                    <input type="text" id="galleryImageDescription" placeholder="Popis fotky..." maxlength="100">
+                </div>
+                <button class="btn btn-primary" onclick="addGalleryImage()" style="margin-bottom: 1rem;">Přidat do galerie</button>
+                
+                <div class="events-list" id="galleryList">
+                    <!-- Gallery items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Newsletter Subscribers -->
+            <div class="section">
+                <h2>Newsletter - přihlášení</h2>
+                <div class="subscribers-list" id="subscribersList">
+                    <!-- Subscribers will be populated here -->
+                </div>
+                <button class="btn btn-primary" onclick="exportSubscribers()" style="margin-top: 1rem;">Export CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://eyfgtagudbvzorrdntdf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5Zmd0YWd1ZGJ2em9ycmRudGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4MzEwMDMsImV4cCI6MjA3MDQwNzAwM30.uw5k8YWuIzM2Q1e8dzwSKXJBlA_wViVdAvtue6Qx0A0';
+        const ADMIN_PASSWORD = 'NightyNight99!';
+        
+        // Initialize Supabase client with error handling
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                auth: {
+                    persistSession: false // Disable session to avoid multiple client issues
+                }
+            });
+            console.log('Supabase client initialized successfully');
+        } catch (error) {
+            console.error('Failed to initialize Supabase client:', error);
+        }
+        
+        // Initialize data
+        let events = [];
+        let subscribers = [];
+        let galleryImages = [];
+        let isAuthenticated = false;
+
+        // Utility functions
+        function showAlert(type, message, elementId) {
+            const alertElement = document.getElementById(elementId);
+            alertElement.textContent = message;
+            alertElement.className = `alert alert-${type} show`;
+            setTimeout(() => {
+                alertElement.classList.remove('show');
+            }, 5000);
+        }
+
+        // Authentication
+        function checkAuth() {
+            const authStatus = sessionStorage.getItem('knihovna_admin_auth');
+            if (authStatus === 'true') {
+                isAuthenticated = true;
+                showAdminPanel();
+                return true;
+            }
+            showLoginForm();
+            return false;
+        }
+        
+        function showLoginForm() {
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('adminContainer').style.display = 'none';
+            document.getElementById('adminPassword').focus();
+        }
+        
+        function showAdminPanel() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('adminContainer').style.display = 'block';
+        }
+        
+        function logout() {
+            sessionStorage.removeItem('knihovna_admin_auth');
+            isAuthenticated = false;
+            showLoginForm();
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('knihovna_admin_auth', 'true');
+                isAuthenticated = true;
+                showAdminPanel();
+                initAdmin();
+            } else {
+                showAlert('danger', 'Nesprávné heslo!', 'loginError');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+            }
+        });
+        
+        function updateStats() {
+            document.getElementById('eventCount').textContent = events.length;
+            document.getElementById('subscriberCount').textContent = subscribers.length;
+            document.getElementById('galleryCount').textContent = galleryImages.length;
+            
+            const now = new Date();
+            const upcoming = events.filter(event => new Date(event.date + 'T' + event.time) > now);
+            document.getElementById('upcomingCount').textContent = upcoming.length;
+        }
+
+        // Load data from Supabase
+        async function loadEvents() {
+            if (!supabase) {
+                console.error('Supabase client not initialized');
+                return;
+            }
+            
+            try {
+                console.log('Loading events from Supabase...');
+                const { data, error } = await supabase
+                    .from('events')
+                    .select('*')
+                    .order('date', { ascending: true });
+                    
+                if (error) {
+                    console.error('Supabase error:', error);
+                    throw error;
+                }
+                
+                console.log('Events loaded:', data);
+                events = data || [];
+                renderEvents();
+            } catch (error) {
+                console.error('Error loading events:', error);
+                
+                // Fallback to localStorage
+                const localEvents = localStorage.getItem('events');
+                if (localEvents) {
+                    events = JSON.parse(localEvents);
+                    renderEvents();
+                    console.log('Načteny události z localStorage');
+                } else {
+                    events = [];
+                    renderEvents();
+                    showAlert('danger', 'Chyba při načítání událostí: ' + (error.message || 'Neznámá chyba'), 'eventError');
+                }
+            }
+        }
+        
+        async function loadSubscribers() {
+            try {
+                const { data, error } = await supabase
+                    .from('subscribers')
+                    .select('*')
+                    .order('subscribed_at', { ascending: false });
+                    
+                if (error) throw error;
+                subscribers = data || [];
+                renderSubscribers();
+            } catch (error) {
+                console.error('Error loading subscribers:', error);
+            }
+        }
+        
+        function renderEvents() {
+            const eventsList = document.getElementById('eventsList');
+            
+            if (events.length === 0) {
+                eventsList.innerHTML = '<p style="text-align: center; color: var(--gray-medium); padding: 2rem;">Zatím nejsou přidané žádné události</p>';
+                return;
+            }
+            
+            // Sort events by date
+            const sortedEvents = [...events].sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+            
+            eventsList.innerHTML = sortedEvents.map(event => {
+                const eventDate = new Date(event.date + 'T' + event.time);
+                const isUpcoming = eventDate > new Date();
+                const typeLabels = {
+                    'cteni': 'Autorské čtení',
+                    'diskuze': 'Diskuze',
+                    'workshop': 'Workshop',
+                    'film': 'Film',
+                    'standup': 'Standup',
+                    'kviz': 'Kvíz'
+                };
+                
+                return `
+                    <div class="event-item">
+                        <div class="event-info">
+                            <h4>${event.title} ${isUpcoming ? '' : '<small style="color: var(--gray-medium);">(proběhlo)</small>'}</h4>
+                            <div class="event-meta">
+                                ${typeLabels[event.type]} • ${new Date(event.date).toLocaleDateString('cs-CZ')} ${event.time}
+                            </div>
+                        </div>
+                        <button class="btn btn-danger" onclick="deleteEvent(${event.id})">Smazat</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderSubscribers() {
+            const subscribersList = document.getElementById('subscribersList');
+            
+            if (subscribers.length === 0) {
+                subscribersList.innerHTML = '<p style="text-align: center; color: var(--gray-medium); padding: 2rem;">Zatím se nikdo nepřihlásil k newsletteru</p>';
+                return;
+            }
+            
+            // Sort by date (newest first)
+            const sortedSubscribers = [...subscribers].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            subscribersList.innerHTML = sortedSubscribers.map((subscriber) => `
+                <div class="subscriber-item">
+                    <div>
+                        <strong>${subscriber.email}</strong><br>
+                        <small style="color: var(--gray-medium);">
+                            Přihlášen: ${new Date(subscriber.subscribed_at).toLocaleDateString('cs-CZ')} ${new Date(subscriber.subscribed_at).toLocaleTimeString('cs-CZ', {hour: '2-digit', minute: '2-digit'})}
+                        </small>
+                    </div>
+                    <button class="btn btn-danger" onclick="removeSubscriber(${subscriber.id})">Odebrat</button>
+                </div>
+            `).join('');
+        }
+
+        // Event management
+        document.getElementById('eventForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!isAuthenticated) return;
+            
+            const title = document.getElementById('eventTitle').value.trim();
+            const type = document.getElementById('eventType').value;
+            const date = document.getElementById('eventDate').value;
+            const time = document.getElementById('eventTime').value;
+            const description = document.getElementById('eventDescription').value.trim();
+            const image = document.getElementById('eventImage').value.trim();
+            const shopLink = document.getElementById('eventShopLink').value.trim();
+            
+            // Validation
+            if (!title || !type || !date || !time || !description) {
+                showAlert('danger', 'Prosím vyplňte všechna povinná pole.', 'eventError');
+                return;
+            }
+            
+            // Check if date is not too far in the past
+            const eventDate = new Date(date + 'T' + time);
+            const now = new Date();
+            const daysBefore = (now - eventDate) / (1000 * 60 * 60 * 24);
+            
+            if (daysBefore > 7) {
+                if (!confirm('Datum události je více než týden v minulosti. Chcete pokračovat?')) {
+                    return;
+                }
+            }
+            
+            try {
+                // Create event object
+                const newEvent = {
+                    id: Date.now(),
+                    title: title,
+                    type: type,
+                    date: date,
+                    time: time,
+                    description: description,
+                    image: image,
+                    shopLink: shopLink
+                };
+                
+                // Try to save to Supabase first
+                const { data, error } = await supabase
+                    .from('events')
+                    .insert([{
+                        title: title,
+                        type: type,
+                        date: date,
+                        time: time,
+                        description: description,
+                        image: image,
+                        shop_link: shopLink
+                    }]);
+                    
+                if (error) {
+                    console.log('Supabase save failed, saving to localStorage:', error);
+                    // Save to localStorage as fallback
+                    events.push(newEvent);
+                    localStorage.setItem('events', JSON.stringify(events));
+                } else {
+                    // Also save to localStorage for immediate use
+                    events.push(newEvent);
+                    localStorage.setItem('events', JSON.stringify(events));
+                }
+                
+                // Reset form
+                this.reset();
+                
+                // Reload data and update UI
+                await loadEvents();
+                updateStats();
+                
+                showAlert('success', `Událost "${title}" byla úspěšně přidána!`, 'eventAlert');
+                
+            } catch (error) {
+                console.error('Error adding event:', error);
+                showAlert('danger', 'Chyba při přidávání události: ' + error.message, 'eventError');
+            }
+        });
+
+        async function deleteEvent(id) {
+            if (!isAuthenticated) return;
+            
+            const event = events.find(e => e.id === id);
+            if (confirm(`Opravdu chcete smazat událost "${event.title}"?`)) {
+                try {
+                    // Remove from localStorage first
+                    events = events.filter(e => e.id !== id);
+                    localStorage.setItem('events', JSON.stringify(events));
+                    
+                    // Try to remove from Supabase
+                    const { error } = await supabase
+                        .from('events')
+                        .delete()
+                        .eq('id', id);
+                        
+                    if (error) {
+                        console.log('Supabase delete failed, but localStorage updated:', error);
+                    }
+                    
+                    await loadEvents();
+                    updateStats();
+                    showAlert('success', 'Událost byla smazána.', 'eventAlert');
+                    
+                } catch (error) {
+                    console.error('Error deleting event:', error);
+                    showAlert('danger', 'Chyba při mazání události: ' + error.message, 'eventAlert');
+                }
+            }
+        }
+
+        // About text management
+        function loadAboutText() {
+            const savedAboutText = localStorage.getItem('aboutText');
+            const aboutTextarea = document.getElementById('aboutText');
+            
+            if (savedAboutText) {
+                aboutTextarea.value = savedAboutText;
+            } else {
+                // Default text
+                aboutTextarea.value = 'Knihovna Čermáka a Staňka je nezávislý kulturní prostor v srdci města, který spojuje milovníky literatury, umění a dobrých rozhovorů. Vznikli jsme s vizí vytvořit místo, kde se prolíná tradiční knihovnická atmosféra s živou současnou kulturou.';
+            }
+        }
+
+        async function saveAllContent() {
+            if (!isAuthenticated || !supabase) return;
+            
+            const contentData = {
+                'about_text': document.getElementById('aboutText').value.trim(),
+                'about_description': document.getElementById('aboutDescription').value.trim(),
+                'opening_hours': document.getElementById('openingHours').value.trim(),
+                'contact_address': document.getElementById('contactAddress').value.trim(),
+                'contact_email': document.getElementById('contactEmail').value.trim(),
+                'contact_phone': document.getElementById('contactPhone').value.trim()
+            };
+            
+            // Validate required fields
+            if (!contentData.about_text || !contentData.contact_email) {
+                showAlert('danger', 'Hlavní text "O nás" a email jsou povinné údaje.', 'contentError');
+                return;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(contentData.contact_email)) {
+                showAlert('danger', 'Zadejte platný email.', 'contentError');
+                return;
+            }
+            
+            try {
+                console.log('Saving all content to Supabase...');
+                
+                // Save each setting
+                for (const [key, value] of Object.entries(contentData)) {
+                    const { error } = await supabase
+                        .from('settings')
+                        .upsert({ key: key, value: value }, { onConflict: 'key' });
+                        
+                    if (error) {
+                        console.error(`Error saving ${key}:`, error);
+                        throw error;
+                    }
+                }
+                
+                showAlert('success', 'Všechen obsah byl úspěšně uložen!', 'contentAlert');
+                console.log('All content saved successfully');
+                
+            } catch (error) {
+                console.error('Error saving content:', error);
+                showAlert('danger', 'Chyba při ukládání obsahu: ' + (error.message || 'Neznámá chyba'), 'contentError');
+            }
+        }
+
+        // Subscriber management
+        async function removeSubscriber(id) {
+            if (!isAuthenticated) return;
+            
+            const subscriber = subscribers.find(s => s.id === id);
+            if (confirm(`Opravdu chcete odebrat přihlášení "${subscriber.email}"?`)) {
+                try {
+                    const { error } = await supabase
+                        .from('subscribers')
+                        .delete()
+                        .eq('id', id);
+                        
+                    if (error) throw error;
+                    
+                    await loadSubscribers();
+                    updateStats();
+                    
+                } catch (error) {
+                    console.error('Error removing subscriber:', error);
+                }
+            }
+        }
+
+        function exportSubscribers() {
+            if (subscribers.length === 0) {
+                alert('Nemáte žádné přihlášené k newsletteru.');
+                return;
+            }
+            
+            const csvContent = 'data:text/csv;charset=utf-8,Email,Datum přihlášení\n' + 
+                subscribers.map(sub => `${sub.email},${new Date(sub.date).toLocaleString('cs-CZ')}`).join('\n');
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `newsletter-prihlaseni-${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Load all content from Supabase
+        async function loadAllContent() {
+            try {
+                const { data, error } = await supabase
+                    .from('settings')
+                    .select('*');
+                    
+                if (error) throw error;
+                
+                if (data && data.length > 0) {
+                    data.forEach(setting => {
+                        const element = document.getElementById(setting.key.replace('_', ''));
+                        if (element) {
+                            element.value = setting.value;
+                        } else {
+                            // Handle specific mappings
+                            switch(setting.key) {
+                                case 'about_text':
+                                    const aboutText = document.getElementById('aboutText');
+                                    if (aboutText) aboutText.value = setting.value;
+                                    break;
+                                case 'about_description':
+                                    const aboutDescription = document.getElementById('aboutDescription');
+                                    if (aboutDescription) aboutDescription.value = setting.value;
+                                    break;
+                                case 'opening_hours':
+                                    const openingHours = document.getElementById('openingHours');
+                                    if (openingHours) openingHours.value = setting.value;
+                                    break;
+                                case 'contact_address':
+                                    const contactAddress = document.getElementById('contactAddress');
+                                    if (contactAddress) contactAddress.value = setting.value;
+                                    break;
+                                case 'contact_email':
+                                    const contactEmail = document.getElementById('contactEmail');
+                                    if (contactEmail) contactEmail.value = setting.value;
+                                    break;
+                                case 'contact_phone':
+                                    const contactPhone = document.getElementById('contactPhone');
+                                    if (contactPhone) contactPhone.value = setting.value;
+                                    break;
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading content:', error);
+            }
+        }
+        
+        // Gallery management functions
+        function loadGalleryImages() {
+            const storedImages = localStorage.getItem('galleryImages');
+            if (storedImages) {
+                galleryImages = JSON.parse(storedImages);
+            }
+            renderGalleryImages();
+        }
+
+        function renderGalleryImages() {
+            const galleryList = document.getElementById('galleryList');
+            
+            if (galleryImages.length === 0) {
+                galleryList.innerHTML = '<p style="text-align: center; color: var(--gray-medium); padding: 2rem;">Zatím nejsou přidané žádné fotky</p>';
+                return;
+            }
+            
+            galleryList.innerHTML = galleryImages.map(image => `
+                <div class="event-item">
+                    <div class="event-info" style="display: flex; align-items: center;">
+                        <img src="${image.url}" alt="${image.description}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 1rem;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 60 40\\'><rect fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' text-anchor=\\'middle\\' font-size=\\'8\\' fill=\\'%23999\\'>!</text></svg>'">
+                        <div>
+                            <h4>${image.description}</h4>
+                            <div class="event-meta">${new Date(image.date).toLocaleDateString('cs-CZ')}</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger" onclick="deleteGalleryImage(${image.id})">Smazat</button>
+                </div>
+            `).join('');
+        }
+
+        function addGalleryImage() {
+            const url = document.getElementById('galleryImageUrl').value.trim();
+            const description = document.getElementById('galleryImageDescription').value.trim();
+            
+            if (!url) {
+                showAlert('danger', 'Prosím zadejte URL obrázku.', 'galleryError');
+                return;
+            }
+            
+            if (!url.match(/\.(jpeg|jpg|gif|png|webp)$/i) && !url.includes('unsplash.com') && !url.includes('images.')) {
+                if (!confirm('URL nevypadá jako obrázek. Chcete pokračovat?')) {
+                    return;
+                }
+            }
+            
+            const newImage = {
+                id: Date.now(),
+                url: url,
+                description: description || 'Fotka z klubu',
+                date: new Date().toISOString()
+            };
+            
+            galleryImages.push(newImage);
+            localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+            
+            // Reset form
+            document.getElementById('galleryImageUrl').value = '';
+            document.getElementById('galleryImageDescription').value = '';
+            
+            renderGalleryImages();
+            showAlert('success', 'Fotka byla úspěšně přidána do galerie!', 'galleryAlert');
+        }
+
+        function deleteGalleryImage(id) {
+            if (confirm('Opravdu chcete smazat tuto fotku?')) {
+                galleryImages = galleryImages.filter(img => img.id !== id);
+                localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                renderGalleryImages();
+                showAlert('success', 'Fotka byla smazána.', 'galleryAlert');
+            }
+        }
+
+        // Initialize admin panel
+        async function initAdmin() {
+            // Set minimum date to today for new events
+            document.getElementById('eventDate').min = new Date().toISOString().split('T')[0];
+            
+            await loadAllContent();
+            await loadEvents();
+            await loadSubscribers();
+            loadGalleryImages();
+            updateStats();
+        }
+
+        // Test Supabase connection
+        async function testSupabaseConnection() {
+            if (!supabase) {
+                console.error('Supabase client not available');
+                return false;
+            }
+            
+            try {
+                console.log('Testing Supabase connection...');
+                const { data, error } = await supabase
+                    .from('events')
+                    .select('count')
+                    .limit(1);
+                    
+                if (error) {
+                    console.error('Connection test failed:', error);
+                    return false;
+                }
+                
+                console.log('Supabase connection successful');
+                return true;
+            } catch (error) {
+                console.error('Connection test error:', error);
+                return false;
+            }
+        }
+        
+        // Start the app
+        checkAuth();
+        
+        // Test connection when page loads
+        setTimeout(() => {
+            testSupabaseConnection();
+        }, 1000);
+    </script>
+</body>
+</html>

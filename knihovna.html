@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knihovna Čermáka a Staňka</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'accent-gold': '#c9a961',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .cinema-gradient {
+            background: linear-gradient(135deg, #000000 0%, #1f1f1f 100%);
+        }
+        
+        .event-card {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fade-in 0.6s ease-out;
+        }
+
+
+
+
+
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <header class="bg-black shadow-lg sticky top-0 z-50" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-white">Knihovna Čermáka a Staňka</h1>
+                </div>
+                
+                <nav class="hidden md:flex space-x-8" id="navLinks">
+                    <a href="#home" class="text-white hover:text-red-500 transition-colors duration-200 font-medium">Domů</a>
+                    <a href="#about" class="text-white hover:text-red-500 transition-colors duration-200 font-medium">O nás</a>
+                    <a href="#program" class="text-white hover:text-red-500 transition-colors duration-200 font-medium">Program</a>
+                    <a href="#gallery" class="text-white hover:text-red-500 transition-colors duration-200 font-medium">Galerie</a>
+                    <a href="#contact" class="text-white hover:text-red-500 transition-colors duration-200 font-medium">Kontakt</a>
+                </nav>
+                
+                <div class="hidden md:flex items-center space-x-4">
+                    <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium">
+                        Newsletter
+                    </button>
+                </div>
+                
+                <div class="md:hidden">
+                    <button id="hamburger" class="text-white hover:text-red-500 transition-colors duration-200">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile menu -->
+            <div id="mobileMenu" class="md:hidden bg-black border-t border-gray-800 hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <a href="#home" class="block px-3 py-2 text-white hover:text-red-500 transition-colors duration-200">Domů</a>
+                    <a href="#about" class="block px-3 py-2 text-white hover:text-red-500 transition-colors duration-200">O nás</a>
+                    <a href="#program" class="block px-3 py-2 text-white hover:text-red-500 transition-colors duration-200">Program</a>
+                    <a href="#gallery" class="block px-3 py-2 text-white hover:text-red-500 transition-colors duration-200">Galerie</a>
+                    <a href="#contact" class="block px-3 py-2 text-white hover:text-red-500 transition-colors duration-200">Kontakt</a>
+                    <button class="w-full mt-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200">
+                        Newsletter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="cinema-gradient text-white py-20" id="home">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
+                    Knihovna Čermáka a Staňka
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 text-gray-300 max-w-3xl mx-auto">
+                    Multifunkční kulturní klub pro debaty, standup, kvízy a podcasty s kapacitou 50 míst
+                </p>
+                
+                <div class="bg-red-600 text-white p-6 rounded-lg mb-8 max-w-4xl mx-auto" id="featuredEvent">
+                    <h2 class="text-2xl font-bold mb-2">Aktuální akce</h2>
+                    <p class="text-lg">
+                        Připojte se k našim pravidelným debatám každý čtvrtek ve 20:00
+                    </p>
+                    <button class="mt-4 bg-white text-red-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors duration-200">
+                        Zobrazit program
+                    </button>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#program" class="bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-all duration-200 transform hover:scale-105">
+                        Zobrazit program
+                    </a>
+                    <a href="#about" class="border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-black transition-all duration-200 transform hover:scale-105">
+                        O klubu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="about" class="py-16 bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                    Proč Knihovna Čermáka a Staňka
+                </h2>
+                <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+                    Jedinečný multifunkční kulturní prostor v srdci Prahy
+                </p>
+            </div>
+            
+            <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4 mb-16">
+                <div class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
+                    <div class="text-4xl mb-4">🎭</div>
+                    <h3 class="text-xl font-semibold text-black mb-3">
+                        Standup a Comedy
+                    </h3>
+                    <p class="text-gray-600">
+                        Pravidelné stand-up večery s předními českými i zahraničními komiky
+                    </p>
+                </div>
+                
+                <div class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
+                    <div class="text-4xl mb-4">💬</div>
+                    <h3 class="text-xl font-semibold text-black mb-3">
+                        Debaty a Diskuze
+                    </h3>
+                    <p class="text-gray-600">
+                        Tematické debaty o aktuálních společenských otázkách s odborníky
+                    </p>
+                </div>
+                
+                <div class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
+                    <div class="text-4xl mb-4">🎯</div>
+                    <h3 class="text-xl font-semibold text-black mb-3">
+                        Kvízy a Soutěže
+                    </h3>
+                    <p class="text-gray-600">
+                        Týmové kvízy s různou tématikou pro zábavu i vzdělání
+                    </p>
+                </div>
+                
+                <div class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
+                    <div class="text-4xl mb-4">🎙️</div>
+                    <h3 class="text-xl font-semibold text-black mb-3">
+                        Podcastové Studio
+                    </h3>
+                    <p class="text-gray-600">
+                        Profesionální nahrávání podcastů a rozhlasových pořadů
+                    </p>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg p-8 shadow-lg">
+                <div class="grid gap-8 md:grid-cols-2">
+                    <div>
+                        <h3 class="text-2xl font-bold text-black mb-4">O klubu</h3>
+                        <p class="text-gray-600 mb-4" id="aboutMainText">Načítání...</p>
+                        <p class="text-gray-600 mb-6" id="aboutDescription">Načítání...</p>
+                        
+                        <h4 class="text-lg font-semibold text-black mb-2">Otevírací doba</h4>
+                        <p class="text-gray-600" id="openingHours">Načítání...</p>
+                    </div>
+                    
+                    <div class="grid gap-4 grid-cols-2">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect fill='%23e0e0e0'/><text x='50%' y='50%' text-anchor='middle' font-size='20' fill='%23999'>Interiér klubu</text></svg>" alt="Interiér klubu" class="rounded-lg shadow-md">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 150'><rect fill='%23d0d0d0'/><text x='50%' y='50%' text-anchor='middle' font-size='14' fill='%23999'>Podcastové studio</text></svg>" alt="Podcastové studio" class="rounded-lg shadow-md">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 150'><rect fill='%23c0c0c0'/><text x='50%' y='50%' text-anchor='middle' font-size='14' fill='%23999'>Hlavní sál</text></svg>" alt="Hlavní sál" class="rounded-lg shadow-md">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 150'><rect fill='%23b0b0b0'/><text x='50%' y='50%' text-anchor='middle' font-size='14' fill='%23999'>Bar</text></svg>" alt="Bar" class="rounded-lg shadow-md">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program Section -->
+    <section id="program" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-black mb-4">
+                    Program
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Aktuální akce a události v našem klubu
+                </p>
+            </div>
+            
+            <div id="eventsList" class="space-y-8">
+                <!-- Events will be loaded here -->
+            </div>
+            
+            <div class="text-center mt-12">
+                <button class="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium">
+                    Zobrazit všechny akce
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-16 bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                    Galerie
+                </h2>
+                <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+                    Podívejte se na náš klub a atmosféru našich akcí
+                </p>
+            </div>
+            
+            <div id="galleryGrid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Gallery images will be loaded here -->
+            </div>
+            
+            <div class="text-center mt-12">
+                <button class="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium">
+                    Zobrazit více fotek
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="cinema-gradient text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    Zůstante v obraze
+                </h2>
+                <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                    Přihlaste se k newsletteru a nezmeškejte žádné akce, debaty ani stand-up večery
+                </p>
+                
+                <div id="newsletterSuccess" class="bg-green-600 text-white p-4 rounded-lg max-w-md mx-auto mb-6 hidden">
+                    <p class="font-semibold">Děkujeme za přihlášení!</p>
+                    <p class="text-sm">Budeme vás informovat o nových akcích.</p>
+                </div>
+                
+                <form id="newsletterForm" class="max-w-md mx-auto">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input type="email" id="newsletterEmail" placeholder="Zadejte vaši e-mailovou adresu" class="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                        <button type="submit" class="bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700 transition-colors duration-200 transform hover:scale-105">
+                            Přihlásit se
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-8 flex justify-center space-x-6">
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors duration-200">
+                        <span class="sr-only">Facebook</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors duration-200">
+                        <span class="sr-only">Instagram</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.621 5.367 11.988 11.988 11.988s11.987-5.367 11.987-11.988C24.004 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348zm7.718 0c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors duration-200">
+                        <span class="sr-only">Twitter</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">Knihovna Čermáka a Staňka</h3>
+                    <p class="text-gray-400 mb-4">
+                        Multifunkční kulturní klub v srdci Prahy. Místo pro debaty, standup, kvízy a podcasty.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.621 5.367 11.988 11.988 11.988s11.987-5.367 11.987-11.988C24.004 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348zm7.718 0c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Rychlé odkazy</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#program" class="text-gray-400 hover:text-white transition-colors duration-200">Aktuální program</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors duration-200">O klubu</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition-colors duration-200">Kontakt</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Naše služby</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Standup comedy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Veřejné debaty</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Týmové kvízy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Nahrávání podcastů</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Kontakt</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <p id="contactAddress">Načítání...</p>
+                        <p class="mt-4">
+                            <a href="#" id="contactPhone" class="hover:text-white transition-colors duration-200">Načítání...</a>
+                        </p>
+                        <p>
+                            <a href="#" id="contactEmail" class="hover:text-white transition-colors duration-200">Načítání...</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Knihovna Čermáka a Staňka. Všechna práva vyhrazena.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Admin Toggle Button -->
+    <button class="fixed bottom-4 right-4 w-12 h-12 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-colors duration-200 flex items-center justify-center text-xl z-40" id="adminToggle">
+        ⚙️
+    </button>
+
+    <!-- Admin Panel -->
+    <div class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out z-50 overflow-y-auto" id="adminPanel">
+        <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+            <h2 class="text-xl font-bold text-gray-900">Administrace</h2>
+            <button class="text-gray-500 hover:text-gray-700 transition-colors duration-200" id="adminClose">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="p-6 space-y-8">
+            <!-- Add Event Section -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Přidat událost</h3>
+                <form id="eventForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Název události *</label>
+                        <input type="text" id="eventTitle" required maxlength="100" placeholder="Zadejte název události..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Typ události *</label>
+                        <select id="eventType" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                            <option value="">-- Vyberte typ události --</option>
+                            <option value="cteni">Autorské čtení</option>
+                            <option value="diskuze">Diskuze</option>
+                            <option value="workshop">Workshop</option>
+                            <option value="film">Film</option>
+                            <option value="standup">Standup</option>
+                            <option value="kviz">Kvíz</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Datum *</label>
+                            <input type="date" id="eventDate" required min="2024-01-01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Čas *</label>
+                            <input type="time" id="eventTime" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Popis události *</label>
+                        <textarea id="eventDescription" required maxlength="500" placeholder="Popište událost, její program a další důležité informace..." rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Fotka události (URL)</label>
+                        <input type="url" id="eventImage" placeholder="https://example.com/image.jpg" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Link na eshop/vstupenky</label>
+                        <input type="url" id="eventShopLink" placeholder="https://obchod.example.com/udalost" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <button type="submit" class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium">Přidat událost</button>
+                </form>
+            </div>
+
+            <!-- Manage Events Section -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Správa událostí</h3>
+                <div id="eventList" class="space-y-3">
+                    <!-- Event list will be populated here -->
+                </div>
+            </div>
+
+            <!-- Gallery Management Section -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Správa galerie</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Přidat novou fotku</label>
+                        <input type="url" id="galleryImageUrl" placeholder="https://example.com/image.jpg" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Popis fotky</label>
+                        <input type="text" id="galleryImageDescription" placeholder="Popis fotky..." maxlength="100" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <button class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium" onclick="addGalleryImage()">Přidat fotku</button>
+                </div>
+                
+                <div class="mt-6">
+                    <h4 class="text-md font-medium text-gray-900 mb-3">Aktuální fotky</h4>
+                    <div id="galleryAdminList" class="space-y-2">
+                        <!-- Gallery admin list will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit About Section -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Upravit O nás</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Text o klubu</label>
+                        <textarea id="aboutText" rows="6" maxlength="1000" placeholder="Upravte text sekce O nás..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"></textarea>
+                    </div>
+                    <button class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium" onclick="saveAboutText()">Uložit změny</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Detail Modal -->
+    <div id="eventModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="relative">
+                <button onclick="closeEventDetail()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10 bg-white rounded-full p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <div id="eventModalContent">
+                    <!-- Event detail content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://eyfgtagudbvzorrdntdf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5Zmd0YWd1ZGJ2em9ycmRudGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4MzEwMDMsImV4cCI6MjA3MDQwNzAwM30.uw5k8YWuIzM2Q1e8dzwSKXJBlA_wViVdAvtue6Qx0A0';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Initialize data storage
+        let events = [];
+        let galleryImages = [];
+
+        // Navigation scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        document.getElementById('hamburger').addEventListener('click', () => {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Close mobile menu if open
+                    const mobileMenu = document.getElementById('mobileMenu');
+                    if (mobileMenu) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Admin panel toggle
+        document.getElementById('adminToggle').addEventListener('click', () => {
+            const adminPanel = document.getElementById('adminPanel');
+            adminPanel.classList.remove('translate-x-full');
+        });
+
+        document.getElementById('adminClose').addEventListener('click', () => {
+            const adminPanel = document.getElementById('adminPanel');
+            adminPanel.classList.add('translate-x-full');
+        });
+        
+        // Newsletter form handling
+        document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('newsletterEmail').value;
+            if (email) {
+                // Store newsletter subscription
+                const subscribers = JSON.parse(localStorage.getItem('subscribers') || '[]');
+                if (!subscribers.includes(email)) {
+                    subscribers.push(email);
+                    localStorage.setItem('subscribers', JSON.stringify(subscribers));
+                }
+                
+                // Show success message
+                document.getElementById('newsletterSuccess').classList.remove('hidden');
+                document.getElementById('newsletterForm').classList.add('hidden');
+                
+                // Hide success message after 3 seconds and show form again
+                setTimeout(() => {
+                    document.getElementById('newsletterSuccess').classList.add('hidden');
+                    document.getElementById('newsletterForm').classList.remove('hidden');
+                    document.getElementById('newsletterEmail').value = '';
+                }, 3000);
+            }
+        });
+
+        // Load events from Supabase
+        async function loadEvents() {
+            try {
+                const { data, error } = await supabase
+                    .from('events')
+                    .select('*')
+                    .order('date', { ascending: true });
+                    
+                if (error) throw error;
+                events = data || [];
+                renderEvents();
+            } catch (error) {
+                console.error('Error loading events:', error);
+                // Fallback to localStorage if Supabase fails
+                console.log('Supabase failed, loading from localStorage...');
+                const localEvents = localStorage.getItem('events');
+                if (localEvents) {
+                    console.log('Loading events from localStorage');
+                    events = JSON.parse(localEvents);
+                } else {
+                    console.log('No local events found, creating defaults...');
+                    // Add some default events with images and shop links
+                    const today = new Date();
+                    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+                    const nextMonth = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+                    
+                    events = [
+                        {
+                            id: 1,
+                            title: 'Stand-up večer s hosty',
+                            type: 'standup',
+                            date: nextWeek.toISOString().split('T')[0],
+                            time: '20:00',
+                            description: 'Večer plný smíchu s předními českými komiky. Připravte se na nonstop zábavu a skvělou atmosféru.',
+                            image: 'https://images.unsplash.com/photo-1541532713592-79a0317b6b07?w=600&h=300&fit=crop',
+                            shopLink: 'https://example.com/vstupenky/standup'
+                        },
+                        {
+                            id: 2,
+                            title: 'Debata o budoucnosti AI',
+                            type: 'diskuze',
+                            date: nextMonth.toISOString().split('T')[0],
+                            time: '19:00',
+                            description: 'Diskuze s experty o tom, jak umělá inteligence změní naše životy. Moderuje Dr. Jan Novák.',
+                            image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&h=300&fit=crop',
+                            shopLink: ''
+                        }
+                    ];
+                    localStorage.setItem('events', JSON.stringify(events));
+                }
+                renderEvents();
+            }
+        }
+        
+        // Event management
+        function renderEvents() {
+            const eventsList = document.getElementById('eventsList');
+            
+            // Sort events by date
+            const sortedEvents = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            // Group events by date
+            const eventsByDate = {};
+            sortedEvents.forEach(event => {
+                const date = new Date(event.date);
+                const dateKey = date.toLocaleDateString('cs-CZ', { weekday: 'long', day: 'numeric', month: 'long' });
+                if (!eventsByDate[dateKey]) {
+                    eventsByDate[dateKey] = [];
+                }
+                eventsByDate[dateKey].push(event);
+            });
+
+            // Render events
+            let html = '';
+            Object.keys(eventsByDate).forEach(dateKey => {
+                html += `
+                    <div class="bg-black rounded-lg p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">${dateKey.charAt(0).toUpperCase() + dateKey.slice(1)}</h3>
+                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                `;
+                
+                eventsByDate[dateKey].forEach(event => {
+                    const typeLabels = {
+                        'cteni': 'Autorské čtení',
+                        'diskuze': 'Diskuze',
+                        'workshop': 'Workshop',
+                        'film': 'Film',
+                        'standup': 'Standup',
+                        'kviz': 'Kvíz'
+                    };
+
+                    html += `
+                        <div class="event-card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg border border-gray-200 cursor-pointer" onclick="showEventDetail(${event.id})">
+                            ${event.image ? `
+                                <img src="${event.image}" alt="${event.title}" class="w-full h-32 object-cover" onerror="this.style.display='none'">
+                            ` : ''}
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="text-2xl font-bold text-red-600">
+                                        ${event.time}
+                                    </div>
+                                    <span class="bg-black text-white text-xs font-medium px-2 py-1 rounded">
+                                        ${typeLabels[event.type] || event.type}
+                                    </span>
+                                </div>
+                                <h4 class="text-lg font-semibold text-black mb-2">
+                                    ${event.title}
+                                </h4>
+                                <p class="text-gray-600 text-sm mb-3 line-clamp-2">
+                                    ${event.description}
+                                </p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-500">${event.shopLink ? 'Vstupenky dostupné' : 'Zdarma'}</span>
+                                    <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 text-sm font-medium" onclick="event.stopPropagation(); showEventDetail(${event.id})">
+                                        Více info
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            eventsList.innerHTML = html || '<div class="text-center py-12"><p class="text-gray-500 text-lg">Žádné události v této kategorii</p></div>';
+        }
+
+        // Initial render
+        renderEvents();
+
+        // Admin event list
+        function renderEventList() {
+            const eventList = document.getElementById('eventList');
+            if (events.length === 0) {
+                eventList.innerHTML = '<p class="text-gray-500 text-center py-4">Žádné události</p>';
+                return;
+            }
+            
+            eventList.innerHTML = events.map(event => {
+                const eventDate = new Date(event.date);
+                const formattedDate = eventDate.toLocaleDateString('cs-CZ');
+                const typeLabels = {
+                    'cteni': 'Autorské čtení',
+                    'diskuze': 'Diskuze', 
+                    'workshop': 'Workshop',
+                    'film': 'Film',
+                    'standup': 'Standup',
+                    'kviz': 'Kvíz'
+                };
+                
+                return `
+                    <div class="bg-white border border-gray-200 rounded-lg p-4 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-semibold text-gray-900">${event.title}</h4>
+                            <p class="text-sm text-gray-600">${typeLabels[event.type] || event.type} • ${formattedDate} • ${event.time}</p>
+                        </div>
+                        <button class="text-red-600 hover:text-red-800 font-medium text-sm" onclick="deleteEvent(${event.id})">
+                            Smazat
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Add event form submission
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const title = document.getElementById('eventTitle').value.trim();
+            const type = document.getElementById('eventType').value;
+            const date = document.getElementById('eventDate').value;
+            const time = document.getElementById('eventTime').value;
+            const description = document.getElementById('eventDescription').value.trim();
+            const image = document.getElementById('eventImage').value.trim();
+            const shopLink = document.getElementById('eventShopLink').value.trim();
+            
+            // Validation
+            if (!title || !date || !time || !description) {
+                alert('Prosím vyplňte všechna povinná pole.');
+                return;
+            }
+            
+            // Check if date is not in the past
+            const eventDate = new Date(date + 'T' + time);
+            const now = new Date();
+            if (eventDate < now) {
+                if (!confirm('Datum události je v minulosti. Chcete pokračovat?')) {
+                    return;
+                }
+            }
+            
+            const newEvent = {
+                id: Date.now(),
+                title: title,
+                type: type,
+                date: date,
+                time: time,
+                description: description,
+                image: image,
+                shopLink: shopLink
+            };
+
+            events.push(newEvent);
+            localStorage.setItem('events', JSON.stringify(events));
+            
+            // Reset form
+            this.reset();
+            
+            // Re-render
+            renderEvents();
+            renderEventList();
+            
+            alert('Událost "' + title + '" byla úspěšně přidána!');
+        });
+
+        // Delete event
+        function deleteEvent(id) {
+            if (confirm('Opravdu chcete smazat tuto událost?')) {
+                events = events.filter(event => event.id !== id);
+                localStorage.setItem('events', JSON.stringify(events));
+                renderEvents();
+                renderEventList();
+            }
+        }
+
+        // Save about text
+        function saveAboutText() {
+            const aboutText = document.getElementById('aboutText').value.trim();
+            
+            if (!aboutText) {
+                alert('Text nemůže být prázdný.');
+                return;
+            }
+            
+            localStorage.setItem('aboutText', aboutText);
+            
+            // Update the about section - replace first paragraph content
+            const firstParagraph = document.querySelector('.about-text p');
+            if (firstParagraph) {
+                firstParagraph.textContent = aboutText;
+            }
+            
+            alert('Text sekce "O nás" byl úspěšně uložen!');
+        }
+
+        // Gallery management functions
+        function addGalleryImage() {
+            const url = document.getElementById('galleryImageUrl').value.trim();
+            const description = document.getElementById('galleryImageDescription').value.trim();
+            
+            if (!url) {
+                alert('Prosím zadejte URL obrázku.');
+                return;
+            }
+            
+            if (!url.match(/\.(jpeg|jpg|gif|png|webp)$/i) && !url.includes('unsplash.com') && !url.includes('images.')) {
+                if (!confirm('URL nevypadá jako obrázek. Chcete pokračovat?')) {
+                    return;
+                }
+            }
+            
+            const newImage = {
+                id: Date.now(),
+                url: url,
+                description: description || 'Fotka z klubu',
+                date: new Date().toISOString()
+            };
+            
+            galleryImages.push(newImage);
+            localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+            
+            // Reset form
+            document.getElementById('galleryImageUrl').value = '';
+            document.getElementById('galleryImageDescription').value = '';
+            
+            // Re-render
+            renderGallery();
+            renderGalleryAdminList();
+            
+            alert('Fotka byla úspěšně přidána do galerie!');
+        }
+
+        function deleteGalleryImage(id) {
+            if (confirm('Opravdu chcete smazat tuto fotku?')) {
+                galleryImages = galleryImages.filter(img => img.id !== id);
+                localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                renderGallery();
+                renderGalleryAdminList();
+            }
+        }
+
+        function renderGallery() {
+            const galleryGrid = document.getElementById('galleryGrid');
+            
+            if (galleryImages.length === 0) {
+                galleryGrid.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <p class="text-gray-400 text-lg">Zatím nemáme žádné fotky v galerii</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            galleryGrid.innerHTML = galleryImages.map(image => `
+                <div class="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <img 
+                        src="${image.url}" 
+                        alt="${image.description}"
+                        class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                        onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 400 300\\'><rect fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' text-anchor=\\'middle\\' font-size=\\'20\\' fill=\\'%23999\\'>Obrázek nenalezen</text></svg>'"
+                    >
+                    <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <div class="p-4 text-white">
+                            <h3 class="text-lg font-semibold">${image.description}</h3>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderGalleryAdminList() {
+            const galleryAdminList = document.getElementById('galleryAdminList');
+            
+            if (galleryImages.length === 0) {
+                galleryAdminList.innerHTML = '<p class="text-gray-500 text-center py-4">Žádné fotky</p>';
+                return;
+            }
+            
+            galleryAdminList.innerHTML = galleryImages.map(image => `
+                <div class="bg-white border border-gray-200 rounded-lg p-3 flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <img 
+                            src="${image.url}" 
+                            alt="${image.description}"
+                            class="w-12 h-12 object-cover rounded"
+                            onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 50 50\\'><rect fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' text-anchor=\\'middle\\' font-size=\\'8\\' fill=\\'%23999\\'>!</text></svg>'"
+                        >
+                        <div>
+                            <p class="font-medium text-gray-900">${image.description}</p>
+                            <p class="text-sm text-gray-500">${new Date(image.date).toLocaleDateString('cs-CZ')}</p>
+                        </div>
+                    </div>
+                    <button class="text-red-600 hover:text-red-800 font-medium text-sm" onclick="deleteGalleryImage(${image.id})">
+                        Smazat
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Event detail modal functions
+        function showEventDetail(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) {
+                alert('Událost nenalezena.');
+                return;
+            }
+            
+            const eventDate = new Date(event.date);
+            const formattedDate = eventDate.toLocaleDateString('cs-CZ', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            const typeLabels = {
+                'cteni': 'Autorské čtení',
+                'diskuze': 'Diskuze',
+                'workshop': 'Workshop',
+                'film': 'Film',
+                'standup': 'Standup',
+                'kviz': 'Kvíz'
+            };
+            
+            const modalContent = document.getElementById('eventModalContent');
+            modalContent.innerHTML = `
+                ${event.image ? `
+                    <img src="${event.image}" alt="${event.title}" class="w-full h-64 object-cover rounded-t-lg" onerror="this.style.display='none'">
+                ` : ''}
+                <div class="p-6">
+                    <div class="mb-4">
+                        <span class="inline-block bg-black text-white text-sm font-medium px-3 py-1 rounded-full mb-2">
+                            ${typeLabels[event.type] || event.type}
+                        </span>
+                        <h1 class="text-3xl font-bold text-gray-900 mb-2">${event.title}</h1>
+                        <div class="flex items-center text-gray-600 mb-4">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            ${formattedDate}
+                        </div>
+                        <div class="flex items-center text-gray-600 mb-6">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            ${event.time}
+                        </div>
+                    </div>
+                    
+                    <div class="prose max-w-none mb-6">
+                        <p class="text-gray-700 leading-relaxed">${event.description}</p>
+                    </div>
+                    
+                    <div class="border-t pt-6">
+                        ${event.shopLink ? `
+                            <a href="${event.shopLink}" target="_blank" rel="noopener noreferrer" class="inline-block bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700 transition-colors duration-200 mr-4">
+                                🎫 Koupit vstupenky
+                            </a>
+                        ` : `
+                            <span class="inline-block bg-green-600 text-white px-8 py-3 rounded-lg font-bold">
+                                🆓 Vstup zdarma
+                            </span>
+                        `}
+                        <div class="mt-4 text-sm text-gray-500">
+                            <p>📍 Knihovna Čermáka a Staňka, Národní 28, Praha 1</p>
+                            <p class="mt-1">Kapacita: 50 míst</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Show modal
+            document.getElementById('eventModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeEventDetail() {
+            document.getElementById('eventModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('eventModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEventDetail();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeEventDetail();
+            }
+        });
+
+        // Load all content from Supabase
+        async function loadAllContent() {
+            try {
+                const { data, error } = await supabase
+                    .from('settings')
+                    .select('*');
+                    
+                if (error) throw error;
+                
+                if (data && data.length > 0) {
+                    data.forEach(setting => {
+                        switch(setting.key) {
+                            case 'about_text':
+                                const aboutMainText = document.getElementById('aboutMainText');
+                                if (aboutMainText) {
+                                    aboutMainText.textContent = setting.value;
+                                }
+                                break;
+                                
+                            case 'about_description':
+                                const aboutDescription = document.getElementById('aboutDescription');
+                                if (aboutDescription) {
+                                    aboutDescription.textContent = setting.value;
+                                }
+                                break;
+                                
+                            case 'opening_hours':
+                                const openingHours = document.getElementById('openingHours');
+                                if (openingHours) {
+                                    openingHours.innerHTML = '<strong>' + setting.value.replace('<br>', '</strong><br><strong>') + '</strong>';
+                                }
+                                break;
+                                
+                            case 'contact_address':
+                                const contactAddress = document.getElementById('contactAddress');
+                                if (contactAddress) {
+                                    contactAddress.innerHTML = setting.value;
+                                }
+                                break;
+                                
+                            case 'contact_email':
+                                const contactEmail = document.getElementById('contactEmail');
+                                if (contactEmail) {
+                                    contactEmail.textContent = setting.value;
+                                }
+                                break;
+                                
+                            case 'contact_phone':
+                                const contactPhone = document.getElementById('contactPhone');
+                                if (contactPhone) {
+                                    contactPhone.textContent = setting.value;
+                                }
+                                break;
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading content:', error);
+                // Fallback values
+                const fallbacks = {
+                    aboutMainText: 'Knihovna Čermáka a Staňka je multifunkční kulturní klub s kapacitou 50 míst. Nabízíme jedinečný prostor pro debaty, standup comedy, kvízy a nahrávání podcastů.',
+                    aboutDescription: 'Náš klub spojuje tradici literárních debat s moderními formáty zábavy. Máme vlastní podcastové studio a pravidelně pořádáme tematické večery.',
+                    openingHours: '<strong>Út–Čt:</strong> 18:00–23:00<br><strong>Pá–So:</strong> 18:00–01:00<br><strong>Ne–Po:</strong> Zavřeno',
+                    contactAddress: 'Národní 28<br>110 00 Praha 1',
+                    contactEmail: 'info@knihovnacs.cz',
+                    contactPhone: '+420 234 567 890'
+                };
+                
+                Object.entries(fallbacks).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.innerHTML = value;
+                    }
+                });
+            }
+        }
+
+        // Newsletter form
+        document.querySelector('.newsletter-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const emailInput = this.querySelector('input[type="email"]');
+            const email = emailInput.value.trim().toLowerCase();
+            
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Prosím zadejte platnou e-mailovou adresu.');
+                emailInput.focus();
+                return;
+            }
+            
+            try {
+                // Try to insert into Supabase
+                const { data, error } = await supabase
+                    .from('subscribers')
+                    .insert([{ email: email }]);
+                    
+                if (error) {
+                    if (error.code === '23505') { // Unique constraint violation
+                        alert('Tato e-mailová adresa je již přihlášena k odběru.');
+                    } else {
+                        throw error;
+                    }
+                    this.reset();
+                    return;
+                }
+                
+                this.reset();
+                alert('Děkujeme! E-mail ' + email + ' byl úspěšně přihlášen k odběru novinek.');
+                
+            } catch (error) {
+                console.error('Error subscribing:', error);
+                // Fallback to localStorage
+                let subscribers = JSON.parse(localStorage.getItem('subscribers')) || [];
+                if (subscribers.some(sub => sub.email === email)) {
+                    alert('Tato e-mailová adresa je již přihlášena k odběru.');
+                    this.reset();
+                    return;
+                }
+                
+                subscribers.push({
+                    email: email,
+                    date: new Date().toISOString()
+                });
+                localStorage.setItem('subscribers', JSON.stringify(subscribers));
+                
+                this.reset();
+                alert('Děkujeme! E-mail ' + email + ' byl úspěšně přihlášen k odběru novinek.');
+            }
+        });
+
+        // Force refresh all data
+        async function forceRefreshData() {
+            console.log('Force refreshing all data...');
+            await loadEvents();
+            await loadAllContent();
+            loadGalleryImages();
+        }
+
+        // Load gallery images
+        function loadGalleryImages() {
+            const storedImages = localStorage.getItem('galleryImages');
+            if (storedImages) {
+                galleryImages = JSON.parse(storedImages);
+            } else {
+                // Add some default gallery images
+                galleryImages = [
+                    {
+                        id: 1,
+                        url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop',
+                        description: 'Hlavní sál klubu',
+                        date: new Date().toISOString()
+                    },
+                    {
+                        id: 2,
+                        url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=400&fit=crop',
+                        description: 'Atmosféra během debaty',
+                        date: new Date().toISOString()
+                    },
+                    {
+                        id: 3,
+                        url: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&h=400&fit=crop',
+                        description: 'Podcastové studio',
+                        date: new Date().toISOString()
+                    }
+                ];
+                localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+            }
+            renderGallery();
+            renderGalleryAdminList();
+        }
+
+        // Initialize the application
+        async function initApp() {
+            await loadEvents();
+            await loadAllContent();
+            loadGalleryImages();
+            if (typeof renderEventList === 'function') {
+                renderEventList();
+            }
+        }
+        
+        // Start the app when DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+
+        // Refresh data when page gains focus (returning from admin panel)
+        window.addEventListener('focus', function() {
+            // Delay to ensure localStorage is updated
+            setTimeout(async () => {
+                console.log('Page gained focus, refreshing data...');
+                await loadEvents();
+                await loadAllContent();
+                loadGalleryImages();
+            }, 100);
+        });
+
+        // Also listen for storage events (when localStorage changes in another tab)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'events' || e.key === 'galleryImages') {
+                console.log('localStorage changed, refreshing data...');
+                setTimeout(async () => {
+                    if (e.key === 'events') {
+                        await loadEvents();
+                    }
+                    if (e.key === 'galleryImages') {
+                        loadGalleryImages();
+                    }
+                }, 100);
+            }
+        });
+
+        // Add keyboard shortcut for admin panel (Ctrl + Shift + A)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                const adminPanel = document.getElementById('adminPanel');
+                adminPanel.classList.toggle('translate-x-full');
+            }
+        });
+
+        // Close admin panel when clicking outside
+        document.addEventListener('click', function(e) {
+            const adminPanel = document.getElementById('adminPanel');
+            const adminToggle = document.getElementById('adminToggle');
+            
+            if (!adminPanel.contains(e.target) && !adminToggle.contains(e.target)) {
+                adminPanel.classList.remove('active');
+            }
+        });
+
+        // Prevent closing when clicking inside admin panel
+        document.getElementById('adminPanel').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    </script>
+</body>
+</html>

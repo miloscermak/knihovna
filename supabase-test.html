@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Connection Test</title>
+</head>
+<body>
+    <h1>Supabase Connection Test</h1>
+    <div id="status">Testing connection...</div>
+    <div id="details"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://eyfgtagudbvzorrdntdf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5Zmd0YWd1ZGJ2em9ycmRudGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4MzEwMDMsImV4cCI6MjA3MDQwNzAwM30.uw5k8YWuIzM2Q1e8dzwSKXJBlA_wViVdAvtue6Qx0A0';
+        
+        async function testConnection() {
+            const statusEl = document.getElementById('status');
+            const detailsEl = document.getElementById('details');
+            
+            try {
+                statusEl.textContent = 'Initializing Supabase client...';
+                
+                const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                statusEl.textContent = 'Testing database connection...';
+                
+                // Test basic query
+                const { data, error } = await supabase
+                    .from('events')
+                    .select('id, title')
+                    .limit(5);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                statusEl.textContent = '✅ Connection successful!';
+                detailsEl.innerHTML = `
+                    <h3>Database Test Results:</h3>
+                    <p><strong>Events found:</strong> ${data ? data.length : 0}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+                // Test settings
+                const { data: settings, error: settingsError } = await supabase
+                    .from('settings')
+                    .select('*');
+                
+                if (!settingsError) {
+                    detailsEl.innerHTML += `
+                        <h3>Settings Test:</h3>
+                        <pre>${JSON.stringify(settings, null, 2)}</pre>
+                    `;
+                }
+                
+                // Test subscribers
+                const { data: subscribers, error: subError } = await supabase
+                    .from('subscribers')
+                    .select('*')
+                    .limit(3);
+                
+                if (!subError) {
+                    detailsEl.innerHTML += `
+                        <h3>Subscribers Test:</h3>
+                        <p><strong>Subscribers found:</strong> ${subscribers ? subscribers.length : 0}</p>
+                        <pre>${JSON.stringify(subscribers, null, 2)}</pre>
+                    `;
+                }
+                
+            } catch (error) {
+                statusEl.textContent = '❌ Connection failed!';
+                detailsEl.innerHTML = `
+                    <h3>Error Details:</h3>
+                    <p><strong>Message:</strong> ${error.message}</p>
+                    <p><strong>Details:</strong> ${error.details || 'N/A'}</p>
+                    <p><strong>Code:</strong> ${error.code || 'N/A'}</p>
+                    <pre>${JSON.stringify(error, null, 2)}</pre>
+                `;
+                console.error('Connection test failed:', error);
+            }
+        }
+        
+        // Run test when page loads
+        testConnection();
+    </script>
+</body>
+</html>
