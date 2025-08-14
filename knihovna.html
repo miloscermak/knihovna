@@ -1124,6 +1124,10 @@
             
             // Type labels removed for simplification
             
+            // Get current contact address from the page
+            const contactAddressElement = document.getElementById('contactAddress');
+            const currentAddress = contactAddressElement ? contactAddressElement.innerHTML : 'Knihovna Čermáka a Staňka';
+            
             const modalContent = document.getElementById('eventModalContent');
             modalContent.innerHTML = `
                 ${event.image ? `
@@ -1164,7 +1168,7 @@
                             </span>
                         `}
                         <div class="mt-4 text-sm text-gray-500">
-                            <p>📍 Knihovna Čermáka a Staňka, Národní 28, Praha 1</p>
+                            <p>📍 ${currentAddress}</p>
                             <p class="mt-1">Kapacita: 50 míst</p>
                         </div>
                     </div>
