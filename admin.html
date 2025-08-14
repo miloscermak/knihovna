@@ -622,7 +622,7 @@
                         <div class="event-info">
                             <h4>${event.title} ${isUpcoming ? '' : '<small style="color: var(--gray-medium);">(proběhlo)</small>'}</h4>
                             <div class="event-meta">
-                                ${new Date(event.date).toLocaleDateString('cs-CZ')} • ${event.time}
+                                ${new Date(event.date).toLocaleDateString('cs-CZ')} • ${event.time.slice(0, 5)}
                             </div>
                         </div>
                         <div class="btn-group">
