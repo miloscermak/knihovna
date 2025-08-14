@@ -471,19 +471,19 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
-                        <input type="tel" id="contactPhone" placeholder="+420 234 567 890" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                        <input type="tel" id="adminContactPhone" placeholder="+420 234 567 890" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input type="email" id="contactEmail" placeholder="info@knihovnacs.cz" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                        <input type="email" id="adminContactEmail" placeholder="info@knihovnacs.cz" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Adresa</label>
-                        <input type="text" id="contactAddress" placeholder="Národní 28, 110 00 Praha 1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                        <input type="text" id="adminContactAddress" placeholder="Národní 28, 110 00 Praha 1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Otevírací doba</label>
-                        <textarea id="openingHours" rows="3" placeholder="Po-Pá: 18:00-24:00..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"></textarea>
+                        <textarea id="adminOpeningHours" rows="3" placeholder="Po-Pá: 18:00-24:00..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"></textarea>
                     </div>
                     <button class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium" onclick="saveContactInfo()">Uložit kontaktní údaje</button>
                 </div>
@@ -891,10 +891,10 @@
 
         // Save contact information
         async function saveContactInfo() {
-            const phone = document.getElementById('contactPhone').value.trim();
-            const email = document.getElementById('contactEmail').value.trim();
-            const address = document.getElementById('contactAddress').value.trim();
-            const hours = document.getElementById('openingHours').value.trim();
+            const phone = document.getElementById('adminContactPhone').value.trim();
+            const email = document.getElementById('adminContactEmail').value.trim();
+            const address = document.getElementById('adminContactAddress').value.trim();
+            const hours = document.getElementById('adminOpeningHours').value.trim();
             
             if (!phone && !email && !address && !hours) {
                 alert('Vyplňte alespoň jeden údaj.');
@@ -1163,7 +1163,7 @@
                                     aboutMainText.textContent = setting.value;
                                 }
                                 // Also populate admin form
-                                const aboutTextAdmin = document.querySelector('#adminPanel textarea[id="aboutText"]');
+                                const aboutTextAdmin = document.getElementById('aboutText');
                                 if (aboutTextAdmin) {
                                     aboutTextAdmin.value = setting.value;
                                 }
@@ -1182,7 +1182,7 @@
                                     openingHoursDisplay.innerHTML = '<strong>' + setting.value.replace('<br>', '</strong><br><strong>') + '</strong>';
                                 }
                                 // Also populate admin form
-                                const openingHoursAdmin = document.querySelector('#adminPanel textarea[id="openingHours"]');
+                                const openingHoursAdmin = document.getElementById('adminOpeningHours');
                                 if (openingHoursAdmin) {
                                     openingHoursAdmin.value = setting.value;
                                 }
@@ -1194,7 +1194,7 @@
                                     contactAddressDisplay.innerHTML = setting.value;
                                 }
                                 // Also populate admin form
-                                const contactAddressAdmin = document.querySelector('#adminPanel input[id="contactAddress"]');
+                                const contactAddressAdmin = document.getElementById('adminContactAddress');
                                 if (contactAddressAdmin) {
                                     contactAddressAdmin.value = setting.value;
                                 }
@@ -1206,7 +1206,7 @@
                                     contactEmailDisplay.textContent = setting.value;
                                 }
                                 // Also populate admin form
-                                const contactEmailAdmin = document.querySelector('#adminPanel input[id="contactEmail"]');
+                                const contactEmailAdmin = document.getElementById('adminContactEmail');
                                 if (contactEmailAdmin) {
                                     contactEmailAdmin.value = setting.value;
                                 }
@@ -1218,7 +1218,7 @@
                                     contactPhoneDisplay.textContent = setting.value;
                                 }
                                 // Also populate admin form
-                                const contactPhoneAdmin = document.querySelector('#adminPanel input[id="contactPhone"]');
+                                const contactPhoneAdmin = document.getElementById('adminContactPhone');
                                 if (contactPhoneAdmin) {
                                     contactPhoneAdmin.value = setting.value;
                                 }
