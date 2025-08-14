@@ -713,17 +713,21 @@
                 
                 if (editId) {
                     // Edit existing event
+                    const updateData = {
+                        title: title,
+                        type: type,
+                        date: date,
+                        time: time,
+                        description: description
+                    };
+                    
+                    // Add optional fields only if not empty
+                    if (image) updateData.image = image;
+                    if (shopLink) updateData.shop_link = shopLink;
+                    
                     const { error } = await supabase
                         .from('events')
-                        .update({
-                            title: title,
-                            type: type,
-                            date: date,
-                            time: time,
-                            description: description,
-                            image: image,
-                            shop_link: shopLink
-                        })
+                        .update(updateData)
                         .eq('id', editId);
                         
                     if (error) {
@@ -756,18 +760,22 @@
                         shopLink: shopLink
                     };
                     
-                    // Try to save to Supabase first
+                    // Try to save to Supabase first (basic fields only until schema is fixed)
+                    const eventData = {
+                        title: title,
+                        type: type,
+                        date: date,
+                        time: time,
+                        description: description
+                    };
+                    
+                    // Add optional fields only if not empty
+                    if (image) eventData.image = image;
+                    if (shopLink) eventData.shop_link = shopLink;
+                    
                     const { data, error } = await supabase
                         .from('events')
-                        .insert([{
-                            title: title,
-                            type: type,
-                            date: date,
-                            time: time,
-                            description: description,
-                            image: image,
-                            shop_link: shopLink
-                        }]);
+                        .insert([eventData]);
                         
                     if (error) {
                         console.log('Supabase save failed, saving to localStorage:', error);
