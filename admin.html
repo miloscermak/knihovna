@@ -128,6 +128,11 @@
             resize: vertical;
         }
 
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
         .btn {
             padding: 0.8rem 2rem;
             border: none;
@@ -639,7 +644,10 @@
                                 ${typeLabels[event.type]} • ${new Date(event.date).toLocaleDateString('cs-CZ')} ${event.time}
                             </div>
                         </div>
-                        <button class="btn btn-danger" onclick="deleteEvent(${event.id})">Smazat</button>
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="editEvent(${event.id})">Editovat</button>
+                            <button class="btn btn-danger" onclick="deleteEvent(${event.id})">Smazat</button>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -701,50 +709,86 @@
             }
             
             try {
-                // Create event object
-                const newEvent = {
-                    id: Date.now(),
-                    title: title,
-                    type: type,
-                    date: date,
-                    time: time,
-                    description: description,
-                    image: image,
-                    shopLink: shopLink
-                };
+                const editId = this.dataset.editId;
                 
-                // Try to save to Supabase first
-                const { data, error } = await supabase
-                    .from('events')
-                    .insert([{
+                if (editId) {
+                    // Edit existing event
+                    const { error } = await supabase
+                        .from('events')
+                        .update({
+                            title: title,
+                            type: type,
+                            date: date,
+                            time: time,
+                            description: description,
+                            image: image,
+                            shop_link: shopLink
+                        })
+                        .eq('id', editId);
+                        
+                    if (error) {
+                        console.log('Supabase update failed:', error);
+                        // Update in localStorage as fallback
+                        const eventIndex = events.findIndex(e => e.id == editId);
+                        if (eventIndex !== -1) {
+                            events[eventIndex] = {
+                                id: parseInt(editId),
+                                title, type, date, time, description, image,
+                                shopLink: shopLink
+                            };
+                            localStorage.setItem('events', JSON.stringify(events));
+                        }
+                    }
+                    
+                    showAlert('success', `Událost "${title}" byla úspěšně aktualizována!`, 'eventAlert');
+                    cancelEdit(); // Reset form to add mode
+                    
+                } else {
+                    // Create new event
+                    const newEvent = {
+                        id: Date.now(),
                         title: title,
                         type: type,
                         date: date,
                         time: time,
                         description: description,
                         image: image,
-                        shop_link: shopLink
-                    }]);
+                        shopLink: shopLink
+                    };
                     
-                if (error) {
-                    console.log('Supabase save failed, saving to localStorage:', error);
-                    // Save to localStorage as fallback
-                    events.push(newEvent);
-                    localStorage.setItem('events', JSON.stringify(events));
-                } else {
-                    // Also save to localStorage for immediate use
-                    events.push(newEvent);
-                    localStorage.setItem('events', JSON.stringify(events));
+                    // Try to save to Supabase first
+                    const { data, error } = await supabase
+                        .from('events')
+                        .insert([{
+                            title: title,
+                            type: type,
+                            date: date,
+                            time: time,
+                            description: description,
+                            image: image,
+                            shop_link: shopLink
+                        }]);
+                        
+                    if (error) {
+                        console.log('Supabase save failed, saving to localStorage:', error);
+                        // Save to localStorage as fallback
+                        events.push(newEvent);
+                        localStorage.setItem('events', JSON.stringify(events));
+                    } else {
+                        // Also save to localStorage for immediate use
+                        events.push(newEvent);
+                        localStorage.setItem('events', JSON.stringify(events));
+                    }
+                    
+                    // Reset form
+                    this.reset();
+                    
+                    showAlert('success', `Událost "${title}" byla úspěšně přidána!`, 'eventAlert');
                 }
-                
-                // Reset form
-                this.reset();
                 
                 // Reload data and update UI
                 await loadEvents();
                 updateStats();
-                
-                showAlert('success', `Událost "${title}" byla úspěšně přidána!`, 'eventAlert');
                 
             } catch (error) {
                 console.error('Error adding event:', error);
@@ -780,6 +824,68 @@
                     console.error('Error deleting event:', error);
                     showAlert('danger', 'Chyba při mazání události: ' + error.message, 'eventAlert');
                 }
+            }
+        }
+
+        // Edit existing event
+        function editEvent(id) {
+            if (!isAuthenticated) return;
+            
+            const event = events.find(e => e.id === id);
+            if (!event) {
+                alert('Událost nebyla nalezena.');
+                return;
+            }
+            
+            // Populate form with event data
+            document.getElementById('eventTitle').value = event.title;
+            document.getElementById('eventType').value = event.type;
+            document.getElementById('eventDate').value = event.date;
+            document.getElementById('eventTime').value = event.time;
+            document.getElementById('eventDescription').value = event.description;
+            document.getElementById('eventImage').value = event.image || '';
+            document.getElementById('eventShopLink').value = event.shopLink || '';
+            
+            // Change form to edit mode
+            const form = document.getElementById('eventForm');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.textContent = 'Uložit změny';
+            submitBtn.className = 'btn btn-success';
+            
+            // Add cancel button if not exists
+            let cancelBtn = form.querySelector('.cancel-edit-btn');
+            if (!cancelBtn) {
+                cancelBtn = document.createElement('button');
+                cancelBtn.type = 'button';
+                cancelBtn.className = 'btn btn-secondary cancel-edit-btn';
+                cancelBtn.textContent = 'Zrušit editaci';
+                cancelBtn.onclick = cancelEdit;
+                submitBtn.parentNode.insertBefore(cancelBtn, submitBtn.nextSibling);
+            }
+            
+            // Store edit ID
+            form.dataset.editId = id;
+            
+            // Scroll to form
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Cancel edit mode
+        function cancelEdit() {
+            const form = document.getElementById('eventForm');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const cancelBtn = form.querySelector('.cancel-edit-btn');
+            
+            // Reset form
+            form.reset();
+            delete form.dataset.editId;
+            
+            // Reset buttons
+            submitBtn.textContent = 'Přidat událost';
+            submitBtn.className = 'btn btn-primary';
+            
+            if (cancelBtn) {
+                cancelBtn.remove();
             }
         }
 

@@ -614,6 +614,7 @@
 
         // Load events from Supabase
         async function loadEvents() {
+            console.log('Loading events from Supabase...');
             try {
                 const { data, error } = await supabase
                     .from('events')
@@ -621,7 +622,25 @@
                     .order('date', { ascending: true });
                     
                 if (error) throw error;
-                events = data || [];
+                
+                // Transform Supabase data to match our format
+                const transformedEvents = (data || []).map(event => ({
+                    id: event.id,
+                    title: event.title,
+                    type: event.type,
+                    date: event.date,
+                    time: event.time,
+                    description: event.description,
+                    image: event.image,
+                    shopLink: event.shop_link || ''
+                }));
+                
+                events = transformedEvents;
+                console.log(`Loaded ${events.length} events:`, events);
+                
+                // Also save to localStorage
+                localStorage.setItem('events', JSON.stringify(events));
+                
                 renderEvents();
             } catch (error) {
                 console.error('Error loading events:', error);
@@ -668,7 +687,19 @@
         
         // Event management
         function renderEvents() {
+            console.log('Rendering events:', events);
             const eventsList = document.getElementById('eventsList');
+            
+            if (!eventsList) {
+                console.error('eventsList element not found!');
+                return;
+            }
+            
+            if (events.length === 0) {
+                console.log('No events to display');
+                eventsList.innerHTML = '<div class="text-center py-8"><p class="text-gray-600">Zatím nejsou naplánované žádné události.</p></div>';
+                return;
+            }
             
             // Sort events by date
             const sortedEvents = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
