@@ -1176,37 +1176,61 @@
             console.log('Force refreshing all data...');
             await loadEvents();
             await loadAllContent();
-            loadGalleryImages();
+            await loadGalleryImages();
         }
 
-        // Load gallery images
-        function loadGalleryImages() {
-            const storedImages = localStorage.getItem('galleryImages');
-            if (storedImages) {
-                galleryImages = JSON.parse(storedImages);
-            } else {
-                // Add some default gallery images
-                galleryImages = [
-                    {
-                        id: 1,
-                        url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop',
-                        description: 'Hlavní sál klubu',
-                        date: new Date().toISOString()
-                    },
-                    {
-                        id: 2,
-                        url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=400&fit=crop',
-                        description: 'Atmosféra během debaty',
-                        date: new Date().toISOString()
-                    },
-                    {
-                        id: 3,
-                        url: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&h=400&fit=crop',
-                        description: 'Podcastové studio',
-                        date: new Date().toISOString()
-                    }
-                ];
+        // Load gallery images from Supabase with localStorage sync
+        async function loadGalleryImages() {
+            console.log('Loading gallery images...');
+            try {
+                // First try Supabase
+                const { data, error } = await supabase
+                    .from('gallery')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                    
+                if (error) throw error;
+                
+                galleryImages = data || [];
+                
+                // Also update localStorage for offline use
                 localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                
+                console.log(`Loaded ${galleryImages.length} gallery images from Supabase`);
+                
+            } catch (error) {
+                console.error('Error loading gallery from Supabase:', error);
+                // Fallback to localStorage if Supabase fails
+                console.log('Supabase failed, loading from localStorage...');
+                const storedImages = localStorage.getItem('galleryImages');
+                if (storedImages) {
+                    console.log('Loading gallery from localStorage');
+                    galleryImages = JSON.parse(storedImages);
+                } else {
+                    console.log('No gallery found, using defaults');
+                    // Add some default gallery images
+                    galleryImages = [
+                        {
+                            id: 1,
+                            url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop',
+                            description: 'Hlavní sál klubu',
+                            date: new Date().toISOString()
+                        },
+                        {
+                            id: 2,
+                            url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=400&fit=crop',
+                            description: 'Atmosféra během debaty',
+                            date: new Date().toISOString()
+                        },
+                        {
+                            id: 3,
+                            url: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&h=400&fit=crop',
+                            description: 'Podcastové studio',
+                            date: new Date().toISOString()
+                        }
+                    ];
+                    localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                }
             }
             renderGallery();
             renderGalleryAdminList();
@@ -1216,7 +1240,7 @@
         async function initApp() {
             await loadEvents();
             await loadAllContent();
-            loadGalleryImages();
+            await loadGalleryImages();
             if (typeof renderEventList === 'function') {
                 renderEventList();
             }
@@ -1229,6 +1253,15 @@
             initApp();
         }
 
+        // Auto-refresh data every 15 seconds
+        setInterval(async function() {
+            if (!document.hidden) {
+                console.log('Auto-refreshing data from Supabase...');
+                await loadEvents();
+                await loadGalleryImages();
+            }
+        }, 15000);
+
         // Refresh data when page gains focus (returning from admin panel)
         window.addEventListener('focus', function() {
             // Delay to ensure localStorage is updated
@@ -1236,7 +1269,7 @@
                 console.log('Page gained focus, refreshing data...');
                 await loadEvents();
                 await loadAllContent();
-                loadGalleryImages();
+                await loadGalleryImages();
             }, 100);
         });
 
@@ -1249,7 +1282,7 @@
                         await loadEvents();
                     }
                     if (e.key === 'galleryImages') {
-                        loadGalleryImages();
+                        await loadGalleryImages();
                     }
                 }, 100);
             }

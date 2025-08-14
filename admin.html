@@ -934,10 +934,24 @@
         }
         
         // Gallery management functions
-        function loadGalleryImages() {
-            const storedImages = localStorage.getItem('galleryImages');
-            if (storedImages) {
-                galleryImages = JSON.parse(storedImages);
+        async function loadGalleryImages() {
+            try {
+                const { data, error } = await supabase
+                    .from('gallery')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                    
+                if (error) throw error;
+                
+                galleryImages = data || [];
+                localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                
+            } catch (error) {
+                console.error('Error loading gallery from Supabase:', error);
+                const storedImages = localStorage.getItem('galleryImages');
+                if (storedImages) {
+                    galleryImages = JSON.parse(storedImages);
+                }
             }
             renderGalleryImages();
         }
@@ -964,7 +978,9 @@
             `).join('');
         }
 
-        function addGalleryImage() {
+        async function addGalleryImage() {
+            if (!isAuthenticated) return;
+            
             const url = document.getElementById('galleryImageUrl').value.trim();
             const description = document.getElementById('galleryImageDescription').value.trim();
             
@@ -979,31 +995,78 @@
                 }
             }
             
-            const newImage = {
-                id: Date.now(),
-                url: url,
-                description: description || 'Fotka z klubu',
-                date: new Date().toISOString()
-            };
-            
-            galleryImages.push(newImage);
-            localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
-            
-            // Reset form
-            document.getElementById('galleryImageUrl').value = '';
-            document.getElementById('galleryImageDescription').value = '';
-            
-            renderGalleryImages();
-            showAlert('success', 'Fotka byla úspěšně přidána do galerie!', 'galleryAlert');
+            try {
+                // Save to Supabase first
+                const { data, error } = await supabase
+                    .from('gallery')
+                    .insert([{
+                        url: url,
+                        description: description || 'Fotka z klubu'
+                    }]);
+                    
+                if (error) {
+                    console.log('Supabase save failed, saving to localStorage:', error);
+                    // Fallback to localStorage
+                    const newImage = {
+                        id: Date.now(),
+                        url: url,
+                        description: description || 'Fotka z klubu',
+                        date: new Date().toISOString()
+                    };
+                    galleryImages.push(newImage);
+                    localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                } else {
+                    console.log('Image saved to Supabase successfully');
+                }
+                
+                // Reset form
+                document.getElementById('galleryImageUrl').value = '';
+                document.getElementById('galleryImageDescription').value = '';
+                
+                // Reload data
+                await loadGalleryImages();
+                updateStats();
+                
+                showAlert('success', 'Fotka byla úspěšně přidána do galerie!', 'galleryAlert');
+                
+            } catch (error) {
+                console.error('Error adding gallery image:', error);
+                showAlert('danger', 'Chyba při přidávání fotky: ' + error.message, 'galleryError');
+            }
         }
 
-        function deleteGalleryImage(id) {
+        async function deleteGalleryImage(id) {
+            if (!isAuthenticated) return;
+            
             if (confirm('Opravdu chcete smazat tuto fotku?')) {
-                galleryImages = galleryImages.filter(img => img.id !== id);
-                localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
-                renderGalleryImages();
-                showAlert('success', 'Fotka byla smazána.', 'galleryAlert');
+                try {
+                    // Delete from Supabase first
+                    const { error } = await supabase
+                        .from('gallery')
+                        .delete()
+                        .eq('id', id);
+                        
+                    if (error) {
+                        console.log('Supabase delete failed:', error);
+                        // Fallback to localStorage
+                        galleryImages = galleryImages.filter(img => img.id !== id);
+                        localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                    } else {
+                        console.log('Image deleted from Supabase successfully');
+                    }
+                    
+                    // Reload data
+                    await loadGalleryImages();
+                    updateStats();
+                    
+                    showAlert('success', 'Fotka byla smazána.', 'galleryAlert');
+                    
+                } catch (error) {
+                    console.error('Error deleting gallery image:', error);
+                    showAlert('danger', 'Chyba při mazání fotky: ' + error.message, 'galleryError');
+                }
             }
+        }
         }
 
         // Initialize admin panel
