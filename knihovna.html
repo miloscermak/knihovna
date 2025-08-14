@@ -945,7 +945,7 @@
         }
 
         // Gallery management functions
-        function addGalleryImage() {
+        async function addGalleryImage() {
             const url = document.getElementById('galleryImageUrl').value.trim();
             const description = document.getElementById('galleryImageDescription').value.trim();
             
@@ -960,33 +960,90 @@
                 }
             }
             
-            const newImage = {
-                id: Date.now(),
-                url: url,
-                description: description || 'Fotka z klubu',
-                date: new Date().toISOString()
-            };
-            
-            galleryImages.push(newImage);
-            localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
-            
-            // Reset form
-            document.getElementById('galleryImageUrl').value = '';
-            document.getElementById('galleryImageDescription').value = '';
-            
-            // Re-render
-            renderGallery();
-            renderGalleryAdminList();
-            
-            alert('Fotka byla úspěšně přidána do galerie!');
-        }
-
-        function deleteGalleryImage(id) {
-            if (confirm('Opravdu chcete smazat tuto fotku?')) {
-                galleryImages = galleryImages.filter(img => img.id !== id);
+            try {
+                // Save to Supabase first
+                const { data, error } = await supabase
+                    .from('gallery')
+                    .insert([{
+                        url: url,
+                        description: description || 'Fotka z klubu'
+                    }]);
+                    
+                if (error) {
+                    console.log('Supabase save failed, using localStorage:', error);
+                    // Fallback to localStorage
+                    const newImage = {
+                        id: Date.now(),
+                        url: url,
+                        description: description || 'Fotka z klubu',
+                        date: new Date().toISOString()
+                    };
+                    galleryImages.push(newImage);
+                    localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                } else {
+                    console.log('Image saved to Supabase successfully');
+                }
+                
+                // Reset form
+                document.getElementById('galleryImageUrl').value = '';
+                document.getElementById('galleryImageDescription').value = '';
+                
+                // Reload data
+                await loadGalleryImages();
+                
+                alert('Fotka byla úspěšně přidána do galerie!');
+                
+            } catch (error) {
+                console.error('Error adding gallery image:', error);
+                // Fallback to localStorage
+                const newImage = {
+                    id: Date.now(),
+                    url: url,
+                    description: description || 'Fotka z klubu',
+                    date: new Date().toISOString()
+                };
+                galleryImages.push(newImage);
                 localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                
+                document.getElementById('galleryImageUrl').value = '';
+                document.getElementById('galleryImageDescription').value = '';
+                
                 renderGallery();
                 renderGalleryAdminList();
+                
+                alert('Fotka byla přidána lokálně (Supabase nedostupný).');
+            }
+        }
+
+        async function deleteGalleryImage(id) {
+            if (confirm('Opravdu chcete smazat tuto fotku?')) {
+                try {
+                    // Delete from Supabase first
+                    const { error } = await supabase
+                        .from('gallery')
+                        .delete()
+                        .eq('id', id);
+                        
+                    if (error) {
+                        console.log('Supabase delete failed:', error);
+                        // Fallback to localStorage
+                        galleryImages = galleryImages.filter(img => img.id !== id);
+                        localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                    } else {
+                        console.log('Image deleted from Supabase successfully');
+                    }
+                    
+                    // Reload data
+                    await loadGalleryImages();
+                    
+                } catch (error) {
+                    console.error('Error deleting gallery image:', error);
+                    // Fallback to localStorage
+                    galleryImages = galleryImages.filter(img => img.id !== id);
+                    localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                    renderGallery();
+                    renderGalleryAdminList();
+                }
             }
         }
 
@@ -1247,59 +1304,7 @@
             }
         }
 
-        // Newsletter form
-        document.querySelector('.newsletter-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const emailInput = this.querySelector('input[type="email"]');
-            const email = emailInput.value.trim().toLowerCase();
-            
-            // Basic email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Prosím zadejte platnou e-mailovou adresu.');
-                emailInput.focus();
-                return;
-            }
-            
-            try {
-                // Try to insert into Supabase
-                const { data, error } = await supabase
-                    .from('subscribers')
-                    .insert([{ email: email }]);
-                    
-                if (error) {
-                    if (error.code === '23505') { // Unique constraint violation
-                        alert('Tato e-mailová adresa je již přihlášena k odběru.');
-                    } else {
-                        throw error;
-                    }
-                    this.reset();
-                    return;
-                }
-                
-                this.reset();
-                alert('Děkujeme! E-mail ' + email + ' byl úspěšně přihlášen k odběru novinek.');
-                
-            } catch (error) {
-                console.error('Error subscribing:', error);
-                // Fallback to localStorage
-                let subscribers = JSON.parse(localStorage.getItem('subscribers')) || [];
-                if (subscribers.some(sub => sub.email === email)) {
-                    alert('Tato e-mailová adresa je již přihlášena k odběru.');
-                    this.reset();
-                    return;
-                }
-                
-                subscribers.push({
-                    email: email,
-                    date: new Date().toISOString()
-                });
-                localStorage.setItem('subscribers', JSON.stringify(subscribers));
-                
-                this.reset();
-                alert('Děkujeme! E-mail ' + email + ' byl úspěšně přihlášen k odběru novinek.');
-            }
-        });
+        // Newsletter form already handled above
 
         // Force refresh all data
         async function forceRefreshData() {
