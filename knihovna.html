@@ -95,14 +95,17 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="cinema-gradient text-white py-20" id="home">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="relative text-white py-20 min-h-screen flex items-center" id="home">
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0">
+            <img src="uvodni.jpeg" alt="Knihovna Čermáka a Staňka" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+        </div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div class="text-center">
-                <h1 class="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
-                    Knihovna Čermáka a Staňka
-                </h1>
-                <p class="text-xl md:text-2xl mb-8 text-gray-300 max-w-3xl mx-auto">
-                    Multifunkční kulturní klub pro debaty, standup, kvízy a podcasty s kapacitou 50 míst
+                <p class="text-xl md:text-3xl mb-8 text-white max-w-4xl mx-auto leading-relaxed font-light">
+                    Jedinečný kulturní prostor v Holešovicích. Najdete v něm knihy, Čermáka i Staňka. Minimálně jedno z toho. A taky standup, natáčení podcastů, Bookclub, workshopy nebo třeba kvízy. Máme nejlepší popcorn v Praze, belgická piva, kvalitní whisky i mnoho dalšího.
                 </p>
                 
                 <div class="bg-red-600 text-white p-6 rounded-lg mb-8 max-w-4xl mx-auto" id="featuredEvent">
