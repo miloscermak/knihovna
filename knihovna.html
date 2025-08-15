@@ -1075,7 +1075,7 @@
                 const { error } = await supabase
                     .from('settings')
                     .upsert([{
-                        key: 'about_main_text',
+                        key: 'about_text',
                         value: aboutText
                     }]);
                     
@@ -1436,9 +1436,9 @@
                 
                 if (data && data.length > 0) {
                     data.forEach(setting => {
+                        console.log(`Processing setting: key="${setting.key}", value="${setting.value?.substring(0, 50)}..."`);
                         switch(setting.key) {
                             case 'about_text':
-                            case 'about_main_text':
                                 const aboutMainText = document.getElementById('aboutMainText');
                                 if (aboutMainText) {
                                     aboutMainText.textContent = setting.value;
