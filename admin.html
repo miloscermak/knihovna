@@ -735,17 +735,21 @@
                         .eq('id', editId);
                         
                     if (error) {
-                        console.log('Supabase update failed:', error);
+                        console.error('Supabase update failed:', error);
+                        showAlert('danger', 'Chyba při ukládání do databáze: ' + (error.message || 'Neznámá chyba'), 'eventError');
                         // Update in localStorage as fallback
                         const eventIndex = events.findIndex(e => e.id == editId);
                         if (eventIndex !== -1) {
                             events[eventIndex] = {
                                 id: parseInt(editId),
                                 title, type, date, time, description, image,
-                                shopLink: shopLink
+                                shopLink: shopLink,
+                                buttonText: buttonText
                             };
                             localStorage.setItem('events', JSON.stringify(events));
                         }
+                    } else {
+                        console.log('Event updated in Supabase successfully');
                     }
                     
                     showAlert('success', `Událost "${title}" byla úspěšně aktualizována!`, 'eventAlert');
@@ -815,10 +819,6 @@
                 // Reload data and update UI
                 await loadEvents();
                 updateStats();
-                
-                // IMPORTANT: Always clear editId after save to prevent future saves thinking they're edits
-                delete this.dataset.editId;
-                console.log('Cleared editId after save');
                 
             } catch (error) {
                 console.error('Error adding event:', error);
