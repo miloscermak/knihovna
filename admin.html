@@ -428,6 +428,32 @@
                 <button class="btn btn-primary" onclick="saveAllContent()" style="width: 200px; margin-top: 1rem;">Uložit vše</button>
             </div>
 
+            <!-- Instagram Feed Management -->
+            <div class="section">
+                <h2>Správa Instagram fotek</h2>
+                <div class="alert alert-info">
+                    <p>Přidejte fotky, které se zobrazí v Instagram sekci na webu. Ideální velikost: 300x300px.</p>
+                </div>
+                <div class="alert alert-danger" id="instagramError" style="display: none;"></div>
+                <div class="alert alert-success" id="instagramAlert" style="display: none;"></div>
+                
+                <form class="form-container" onsubmit="event.preventDefault(); addInstagramPhoto();">
+                    <div class="form-group">
+                        <label>URL fotky *</label>
+                        <input type="url" id="instagramPhotoUrl" placeholder="https://example.com/photo.jpg" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Popisek (nepovinný)</label>
+                        <input type="text" id="instagramPhotoCaption" placeholder="Popisek k fotce..." maxlength="100">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Přidat Instagram fotku</button>
+                </form>
+                
+                <div class="list-container" id="instagramList">
+                    <!-- Instagram photos will be populated here -->
+                </div>
+            </div>
+
             <!-- Gallery Management -->
             <div class="section">
                 <h2>Správa galerie</h2>
@@ -1211,6 +1237,137 @@
             }
         }
 
+        // Instagram photo management functions  
+        let instagramPhotos = [];
+
+        async function loadInstagramPhotos() {
+            try {
+                const { data, error } = await supabase
+                    .from('instagram_photos')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                    
+                if (error) throw error;
+                
+                instagramPhotos = data || [];
+                localStorage.setItem('instagramPhotos', JSON.stringify(instagramPhotos));
+                
+            } catch (error) {
+                console.error('Error loading Instagram photos from Supabase:', error);
+                const storedPhotos = localStorage.getItem('instagramPhotos');
+                if (storedPhotos) {
+                    instagramPhotos = JSON.parse(storedPhotos);
+                }
+            }
+            renderInstagramPhotos();
+        }
+
+        function renderInstagramPhotos() {
+            const instagramList = document.getElementById('instagramList');
+            
+            if (instagramPhotos.length === 0) {
+                instagramList.innerHTML = '<p style="text-align: center; color: var(--gray-medium); padding: 2rem;">Zatím nejsou přidané žádné Instagram fotky</p>';
+                return;
+            }
+            
+            instagramList.innerHTML = instagramPhotos.map(photo => `
+                <div class="event-item">
+                    <div class="event-info" style="display: flex; align-items: center;">
+                        <img src="${photo.url}" alt="${photo.caption || 'Instagram foto'}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; margin-right: 1rem;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 60 60\\'><rect fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' text-anchor=\\'middle\\' font-size=\\'8\\' fill=\\'%23999\\'>!</text></svg>'">
+                        <div>
+                            <h4>${photo.caption || 'Bez popisku'}</h4>
+                            <div class="event-meta">${new Date(photo.created_at).toLocaleDateString('cs-CZ')}</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger" onclick="deleteInstagramPhoto(${photo.id})">Smazat</button>
+                </div>
+            `).join('');
+        }
+
+        async function addInstagramPhoto() {
+            if (!isAuthenticated) return;
+            
+            const url = document.getElementById('instagramPhotoUrl').value.trim();
+            const caption = document.getElementById('instagramPhotoCaption').value.trim();
+            
+            if (!url) {
+                showAlert('danger', 'URL fotky je povinný!', 'instagramError');
+                return;
+            }
+
+            try {
+                const newPhoto = {
+                    url: url,
+                    caption: caption || null,
+                    created_at: new Date().toISOString()
+                };
+
+                // Try to add to Supabase first
+                const { data, error } = await supabase
+                    .from('instagram_photos')
+                    .insert([newPhoto])
+                    .select()
+                    .single();
+                    
+                if (error) {
+                    console.log('Supabase insert failed:', error);
+                    // Fallback to localStorage
+                    newPhoto.id = Date.now();
+                    instagramPhotos.unshift(newPhoto);
+                    localStorage.setItem('instagramPhotos', JSON.stringify(instagramPhotos));
+                } else {
+                    console.log('Photo added to Supabase successfully');
+                }
+                
+                // Clear form
+                document.getElementById('instagramPhotoUrl').value = '';
+                document.getElementById('instagramPhotoCaption').value = '';
+                
+                // Reload data
+                await loadInstagramPhotos();
+                updateStats();
+                
+                showAlert('success', 'Instagram fotka byla přidána!', 'instagramAlert');
+                
+            } catch (error) {
+                console.error('Error adding Instagram photo:', error);
+                showAlert('danger', 'Chyba při přidávání fotky: ' + error.message, 'instagramError');
+            }
+        }
+
+        async function deleteInstagramPhoto(id) {
+            if (!isAuthenticated) return;
+            
+            if (confirm('Opravdu chcete smazat tuto Instagram fotku?')) {
+                try {
+                    // Delete from Supabase first
+                    const { error } = await supabase
+                        .from('instagram_photos')
+                        .delete()
+                        .eq('id', id);
+                        
+                    if (error) {
+                        console.log('Supabase delete failed:', error);
+                        // Fallback to localStorage
+                        instagramPhotos = instagramPhotos.filter(photo => photo.id !== id);
+                        localStorage.setItem('instagramPhotos', JSON.stringify(instagramPhotos));
+                    } else {
+                        console.log('Photo deleted from Supabase successfully');
+                    }
+                    
+                    // Reload data
+                    await loadInstagramPhotos();
+                    updateStats();
+                    
+                    showAlert('success', 'Instagram fotka byla smazána.', 'instagramAlert');
+                    
+                } catch (error) {
+                    console.error('Error deleting Instagram photo:', error);
+                    showAlert('danger', 'Chyba při mazání fotky: ' + error.message, 'instagramError');
+                }
+            }
+        }
+
         // Initialize admin panel
         async function initAdmin() {
             // Set minimum date to today for new events
@@ -1220,6 +1377,7 @@
             await loadEvents();
             await loadSubscribers();
             loadGalleryImages();
+            await loadInstagramPhotos();
             updateStats();
         }
 

@@ -60,7 +60,7 @@
                     <a href="#about" class="text-white hover:text-red-500 transition-colors duration-200 font-medium">O nás</a>
                     <a href="#program" class="text-white hover:text-red-500 transition-colors duration-200 font-medium">Program</a>
                     <a href="#team" class="text-white hover:text-red-500 transition-colors duration-200 font-medium">Tým</a>
-                    <a href="#instagram" class="text-white hover:text-red-500 transition-colors duration-200 font-medium">Instagram</a>
+                    <!-- <a href="#instagram" class="text-white hover:text-red-500 transition-colors duration-200 font-medium">Instagram</a> -->
                     <a href="#gallery" class="text-white hover:text-red-500 transition-colors duration-200 font-medium">Galerie</a>
                     <a href="#contact" class="text-white hover:text-red-500 transition-colors duration-200 font-medium">Kontakt</a>
                 </nav>
@@ -87,7 +87,7 @@
                     <a href="#about" class="block px-3 py-2 text-white hover:text-red-500 transition-colors duration-200">O nás</a>
                     <a href="#program" class="block px-3 py-2 text-white hover:text-red-500 transition-colors duration-200">Program</a>
                     <a href="#team" class="block px-3 py-2 text-white hover:text-red-500 transition-colors duration-200">Tým</a>
-                    <a href="#instagram" class="block px-3 py-2 text-white hover:text-red-500 transition-colors duration-200">Instagram</a>
+                    <!-- <a href="#instagram" class="block px-3 py-2 text-white hover:text-red-500 transition-colors duration-200">Instagram</a> -->
                     <a href="#gallery" class="block px-3 py-2 text-white hover:text-red-500 transition-colors duration-200">Galerie</a>
                     <a href="#contact" class="block px-3 py-2 text-white hover:text-red-500 transition-colors duration-200">Kontakt</a>
                     <button class="w-full mt-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200" style="display: none;">
@@ -239,7 +239,7 @@
             <div class="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
                 <!-- Miloš -->
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                    <img src="milos.avif" alt="Miloš Čermák" class="w-full h-64 object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 400 300\\'><rect fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' text-anchor=\\'middle\\' font-size=\\'20\\' fill=\\'%23999\\'>Miloš Čermák</text></svg>'">
+                    <img src="milos.avif" alt="Miloš Čermák" class="w-full h-64 object-cover" style="object-position: center 10%" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 400 300\\'><rect fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' text-anchor=\\'middle\\' font-size=\\'20\\' fill=\\'%23999\\'>Miloš Čermák</text></svg>'">
                     <div class="p-6">
                         <h3 class="text-2xl font-bold text-black mb-2">Miloš Čermák</h3>
                         <p class="text-gray-600 mb-4">
@@ -262,7 +262,7 @@
                 
                 <!-- Luděk -->
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                    <img src="ludek.avif" alt="Luděk Staněk" class="w-full h-64 object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 400 300\\'><rect fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' text-anchor=\\'middle\\' font-size=\\'20\\' fill=\\'%23999\\'>Luděk Staněk</text></svg>'">
+                    <img src="ludek.avif" alt="Luděk Staněk" class="w-full h-64 object-cover" style="object-position: center 10%" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 400 300\\'><rect fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' text-anchor=\\'middle\\' font-size=\\'20\\' fill=\\'%23999\\'>Luděk Staněk</text></svg>'">
                     <div class="p-6">
                         <h3 class="text-2xl font-bold text-black mb-2">Luděk Staněk</h3>
                         <p class="text-gray-600 mb-4">
@@ -286,8 +286,8 @@
         </div>
     </section>
 
-    <!-- Instagram Section -->
-    <section id="instagram" class="py-16 bg-black">
+    <!-- Instagram Section - TEMPORARILY HIDDEN -->
+    <section id="instagram" class="py-16 bg-black" style="display: none;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -296,40 +296,28 @@
                 <p class="text-xl text-gray-300 max-w-2xl mx-auto mb-6">
                     Sledujte nás pro nejnovější fotky z akcí a zákulisí
                 </p>
-                <a href="https://instagram.com/knihovnacs" target="_blank" rel="noopener noreferrer" class="inline-flex items-center bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 transition-all duration-200">
+                <a href="https://www.instagram.com/cermakstanekcomedy" target="_blank" rel="noopener noreferrer" class="inline-flex items-center bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 transition-all duration-200">
                     <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.621 5.367 11.988 11.988 11.988s11.987-5.367 11.987-11.988C24.004 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348zm7.718 0c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348z"/>
                     </svg>
-                    Sledovat @knihovnacs
+                    Sledovat @cermakstanekcomedy
                 </a>
             </div>
             
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="instagramFeed">
-                <!-- Instagram photos will be loaded here -->
-                <div class="aspect-square bg-gray-800 rounded-lg overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=300&h=300&fit=crop" alt="Instagram post" class="w-full h-full object-cover">
-                </div>
-                <div class="aspect-square bg-gray-800 rounded-lg overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop" alt="Instagram post" class="w-full h-full object-cover">
-                </div>
-                <div class="aspect-square bg-gray-800 rounded-lg overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1590086782792-42dd2350140d?w=300&h=300&fit=crop" alt="Instagram post" class="w-full h-full object-cover">
-                </div>
-                <div class="aspect-square bg-gray-800 rounded-lg overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=300&h=300&fit=crop" alt="Instagram post" class="w-full h-full object-cover">
-                </div>
-                <div class="aspect-square bg-gray-800 rounded-lg overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1541532713592-79a0317b6b07?w=300&h=300&fit=crop" alt="Instagram post" class="w-full h-full object-cover">
-                </div>
-                <div class="aspect-square bg-gray-800 rounded-lg overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop" alt="Instagram post" class="w-full h-full object-cover">
-                </div>
-                <div class="aspect-square bg-gray-800 rounded-lg overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=300&h=300&fit=crop" alt="Instagram post" class="w-full h-full object-cover">
-                </div>
-                <div class="aspect-square bg-gray-800 rounded-lg overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=300&h=300&fit=crop" alt="Instagram post" class="w-full h-full object-cover">
-                </div>
+            <!-- NoCodeAPI Instagram Feed Integration -->
+            <script type="module" src="https://unpkg.com/@nocodeapi/embed-instagram-feed@latest/embed-instagram-feed.js?module"></script>
+            
+            <div class="instagram-container">
+                <!-- Instagram feed will be loaded automatically via NoCodeAPI -->
+                <embed-instagram-feed 
+                    url="https://v1.nocodeapi.com/YOUR_ENDPOINT_HERE/instagram/YOUR_KEY_HERE"
+                    class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                </embed-instagram-feed>
+            </div>
+            
+            <!-- Fallback for when NoCodeAPI is not available -->
+            <div id="instagramFallback" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" style="display: none;">
+                <!-- Fallback Instagram photos will be loaded here -->
             </div>
         </div>
     </section>
@@ -792,6 +780,80 @@
                 }
                 renderEvents();
             }
+        }
+
+        // Instagram feed management (fallback system)
+        async function loadInstagramPhotos() {
+            console.log('Checking if NoCodeAPI Instagram feed is working...');
+            
+            // Wait a moment to see if NoCodeAPI loads
+            setTimeout(() => {
+                const embedElement = document.querySelector('embed-instagram-feed');
+                const fallbackElement = document.getElementById('instagramFallback');
+                
+                if (embedElement && embedElement.children.length === 0) {
+                    console.log('NoCodeAPI not working, using fallback...');
+                    loadInstagramPhotosFallback();
+                    fallbackElement.style.display = 'grid';
+                } else {
+                    console.log('NoCodeAPI Instagram feed loaded successfully');
+                    fallbackElement.style.display = 'none';
+                }
+            }, 3000); // Wait 3 seconds for NoCodeAPI to load
+        }
+
+        // Fallback: Load Instagram photos from admin-managed collection
+        async function loadInstagramPhotosFallback() {
+            console.log('Loading Instagram photos from admin collection as fallback...');
+            try {
+                const { data, error } = await supabase
+                    .from('instagram_photos')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(12); // Limit to 12 most recent photos
+                    
+                if (error) throw error;
+                
+                const instagramPhotos = data || [];
+                console.log(`Loaded ${instagramPhotos.length} Instagram photos:`, instagramPhotos);
+                
+                renderInstagramFeedFallback(instagramPhotos);
+                
+            } catch (error) {
+                console.error('Error loading Instagram photos from Supabase:', error);
+                // Fallback to localStorage if available
+                const storedPhotos = localStorage.getItem('instagramPhotos');
+                if (storedPhotos) {
+                    const instagramPhotos = JSON.parse(storedPhotos).slice(0, 12);
+                    renderInstagramFeedFallback(instagramPhotos);
+                }
+            }
+        }
+
+        function renderInstagramFeedFallback(photos) {
+            const instagramFallback = document.getElementById('instagramFallback');
+            
+            if (!instagramFallback) {
+                console.error('instagramFallback element not found!');
+                return;
+            }
+            
+            if (photos.length === 0) {
+                console.log('No Instagram photos to display');
+                instagramFallback.innerHTML = '<div class="col-span-full text-center py-8"><p class="text-gray-400">Zatím nejsou přidané žádné fotky.</p></div>';
+                return;
+            }
+            
+            instagramFallback.innerHTML = photos.map(photo => `
+                <div class="aspect-square bg-gray-800 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-200">
+                    <img 
+                        src="${photo.url}" 
+                        alt="${photo.caption || 'Instagram post'}" 
+                        class="w-full h-full object-cover"
+                        onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-gray-700 flex items-center justify-center\\'>📷</div>'"
+                    >
+                </div>
+            `).join('');
         }
         
         // Event management
@@ -1527,6 +1589,7 @@
             await loadEvents();
             await loadAllContent();
             await loadGalleryImages();
+            await loadInstagramPhotos();
             if (typeof renderEventList === 'function') {
                 renderEventList();
             }
@@ -1545,6 +1608,7 @@
                 console.log('Auto-refreshing data from Supabase...');
                 await loadEvents();
                 await loadGalleryImages();
+                await loadInstagramPhotos();
             }
         }, 15000);
 
@@ -1556,12 +1620,13 @@
                 await loadEvents();
                 await loadAllContent();
                 await loadGalleryImages();
+                await loadInstagramPhotos();
             }, 100);
         });
 
         // Also listen for storage events (when localStorage changes in another tab)
         window.addEventListener('storage', function(e) {
-            if (e.key === 'events' || e.key === 'galleryImages') {
+            if (e.key === 'events' || e.key === 'galleryImages' || e.key === 'instagramPhotos') {
                 console.log('localStorage changed, refreshing data...');
                 setTimeout(async () => {
                     if (e.key === 'events') {
@@ -1569,6 +1634,9 @@
                     }
                     if (e.key === 'galleryImages') {
                         await loadGalleryImages();
+                    }
+                    if (e.key === 'instagramPhotos') {
+                        await loadInstagramPhotos();
                     }
                 }, 100);
             }

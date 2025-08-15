@@ -6,6 +6,7 @@ Multifunkční kulturní klub s moderním webem pro správu událostí a galerie
 
 - **Moderní responzivní design** s Tailwind CSS
 - **Program událostí** s fotkami a linky na vstupenky
+- **Automatický Instagram feed** s NoCodeAPI + fallback
 - **Galerie** s možností správy přes admin panel
 - **Newsletter** pro přihlášení k odběru novinek
 - **Admin panel** pro správu obsahu
@@ -24,6 +25,7 @@ Admin panel je dostupný na: [https://miloscermak.github.io/knihovna/admin.html]
 ### Admin funkce:
 - ➕ Přidávání událostí s fotkami a eshop linky
 - 🖼️ Správa galerie (přidávání/mazání fotek)
+- 📸 **Správa Instagram fotek** (fallback pro automatický feed)
 - 📝 Úprava obsahu webu (O nás, kontakty)
 - 📊 Statistiky (události, newsletter, galerie)
 - 📧 Export newsletter přihlášení
@@ -82,6 +84,22 @@ Web kombinuje moderní Tailwind CSS design s funkčností původního vanilla JS
 - **Akcent:** Červená (#DC2626) 
 - **Pozadí:** Šedá (#F9FAFB)
 - **Text:** Černá s šedými odstíny
+
+## 📸 Instagram Feed Integration
+
+Web používá **hybridní systém** pro Instagram fotky:
+
+### 🚀 Primární: NoCodeAPI (Automatický)
+- Automatické načítání z @cermakstanekcomedy
+- Real-time synchronizace s Instagram účtem
+- Žádná ruční správa nutná
+
+### 🔄 Fallback: Admin Panel (Ruční)
+- Pokud NoCodeAPI nefunguje, automaticky se přepne na ruční správu
+- Admin může přidávat fotky přes admin panel
+- Spolehlivý fallback systém
+
+**Setup:** Viz `instagram-nocodeapi-setup.md` pro detailní návod
 
 ## 📞 Kontakt
 
