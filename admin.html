@@ -713,6 +713,7 @@
                 console.log('Edit ID:', editId);
                 
                 if (editId) {
+                    console.log('Editing existing event with ID:', editId);
                     // Edit existing event
                     const updateData = {
                         title: title,
@@ -727,6 +728,7 @@
                     if (shopLink) updateData.shop_link = shopLink;
                     if (buttonText) updateData.button_text = buttonText;
                     
+                    console.log('Updating Supabase with:', updateData);
                     const { error } = await supabase
                         .from('events')
                         .update(updateData)
@@ -813,6 +815,10 @@
                 // Reload data and update UI
                 await loadEvents();
                 updateStats();
+                
+                // IMPORTANT: Always clear editId after save to prevent future saves thinking they're edits
+                delete this.dataset.editId;
+                console.log('Cleared editId after save');
                 
             } catch (error) {
                 console.error('Error adding event:', error);
