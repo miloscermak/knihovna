@@ -728,7 +728,8 @@
                     if (shopLink) updateData.shop_link = shopLink;
                     if (buttonText) updateData.button_text = buttonText;
                     
-                    console.log('Updating Supabase with:', updateData);
+                    console.log('Updating Supabase with:');
+                    console.log('  updateData:', JSON.stringify(updateData, null, 2));
                     const { error } = await supabase
                         .from('events')
                         .update(updateData)
@@ -867,6 +868,8 @@
                 return;
             }
             
+            console.log('Editing event:', JSON.stringify(event, null, 2));
+            
             // Populate form with event data
             document.getElementById('eventTitle').value = event.title;
             // eventType field removed
@@ -874,8 +877,8 @@
             document.getElementById('eventTime').value = event.time;
             document.getElementById('eventDescription').value = event.description;
             document.getElementById('eventImage').value = event.image || '';
-            document.getElementById('eventShopLink').value = event.shopLink || '';
-            document.getElementById('eventButtonText').value = event.buttonText || '';
+            document.getElementById('eventShopLink').value = event.shop_link || event.shopLink || '';
+            document.getElementById('eventButtonText').value = event.button_text || event.buttonText || '';
             
             // Change form to edit mode
             const form = document.getElementById('eventForm');
