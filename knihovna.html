@@ -788,7 +788,7 @@
         }
 
         // Add event form submission
-        document.getElementById('eventForm').addEventListener('submit', function(e) {
+        document.getElementById('eventForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Get form values
@@ -816,27 +816,59 @@
                 }
             }
             
-            const newEvent = {
-                id: Date.now(),
-                title: title,
-                type: type,
-                date: date,
-                time: time,
-                description: description,
-                image: image,
-                shopLink: shopLink,
-                buttonText: buttonText
-            };
-
-            events.push(newEvent);
-            localStorage.setItem('events', JSON.stringify(events));
-            
-            // Reset form
-            this.reset();
-            
-            // Re-render
-            renderEvents();
-            renderEventList();
+            try {
+                // Create event data for Supabase
+                const eventData = {
+                    title: title,
+                    type: type,
+                    date: date,
+                    time: time,
+                    description: description
+                };
+                
+                // Add optional fields only if not empty
+                if (image) eventData.image = image;
+                if (shopLink) eventData.shop_link = shopLink;
+                if (buttonText) eventData.button_text = buttonText;
+                
+                // Try to save to Supabase first
+                const { data, error } = await supabase
+                    .from('events')
+                    .insert([eventData]);
+                    
+                if (error) {
+                    console.log('Supabase save failed, saving to localStorage:', error);
+                    
+                    // Fallback to localStorage
+                    const newEvent = {
+                        id: Date.now(),
+                        title: title,
+                        type: type,
+                        date: date,
+                        time: time,
+                        description: description,
+                        image: image,
+                        shopLink: shopLink,
+                        buttonText: buttonText
+                    };
+                    
+                    events.push(newEvent);
+                    localStorage.setItem('events', JSON.stringify(events));
+                } else {
+                    console.log('Event saved to Supabase successfully');
+                }
+                
+                // Reset form
+                this.reset();
+                
+                // Reload events and re-render
+                await loadEvents();
+                renderEventList();
+                
+            } catch (error) {
+                console.error('Error adding event:', error);
+                alert('Chyba při přidávání události: ' + error.message);
+            }
             
             alert('Událost "' + title + '" byla úspěšně přidána!');
         });
