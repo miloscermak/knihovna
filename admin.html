@@ -684,7 +684,15 @@
                 return;
             }
             
-            console.log('Adding event with data:', {title, type, date, time, description, image, shopLink, buttonText});
+            console.log('Adding event with data:');
+            console.log('  title:', title);
+            console.log('  type:', type);
+            console.log('  date:', date);
+            console.log('  time:', time);
+            console.log('  description:', description);
+            console.log('  image:', image);
+            console.log('  shopLink:', shopLink);
+            console.log('  buttonText:', buttonText);
             
             // Check if date is not too far in the past
             const eventDate = new Date(date + 'T' + time);
@@ -692,13 +700,17 @@
             const daysBefore = (now - eventDate) / (1000 * 60 * 60 * 24);
             
             if (daysBefore > 7) {
+                console.log('Event is more than 7 days in past, asking for confirmation');
                 if (!confirm('Datum události je více než týden v minulosti. Chcete pokračovat?')) {
+                    console.log('User cancelled old date confirmation');
                     return;
                 }
             }
             
+            console.log('Proceeding with event save...');
             try {
                 const editId = this.dataset.editId;
+                console.log('Edit ID:', editId);
                 
                 if (editId) {
                     // Edit existing event
@@ -738,6 +750,7 @@
                     cancelEdit(); // Reset form to add mode
                     
                 } else {
+                    console.log('Creating new event (not editing)');
                     // Create new event
                     const newEvent = {
                         id: Date.now(),
