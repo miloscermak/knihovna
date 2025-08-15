@@ -1202,11 +1202,10 @@
                             <a href="${event.shopLink}" target="_blank" rel="noopener noreferrer" class="inline-block bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700 transition-colors duration-200 mr-4">
                                 🎫 Koupit vstupenky
                             </a>
-                        ` : `
-                            <span class="inline-block bg-green-600 text-white px-8 py-3 rounded-lg font-bold">
-                                ${event.buttonText || '🆓 Vstup zdarma'}
-                            </span>
-                        `}
+                        ` : ''}
+                        <button onclick="closeEventDetail()" class="inline-block bg-gray-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-700 transition-colors duration-200">
+                            ℹ️ Více info na místě
+                        </button>
                         <div class="mt-4 text-sm text-gray-500">
                             <p>📍 ${currentAddress}</p>
                             <p class="mt-1">Kapacita: 50 míst</p>

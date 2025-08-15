@@ -723,10 +723,10 @@
                         description: description
                     };
                     
-                    // Add optional fields only if not empty
-                    if (image) updateData.image = image;
-                    if (shopLink) updateData.shop_link = shopLink;
-                    if (buttonText) updateData.button_text = buttonText;
+                    // Add all fields (empty values will clear them in database)
+                    updateData.image = image;
+                    updateData.shop_link = shopLink; 
+                    updateData.button_text = buttonText;
                     
                     console.log('Updating Supabase with:');
                     console.log('  updateData:', JSON.stringify(updateData, null, 2));
@@ -779,10 +779,10 @@
                         description: description
                     };
                     
-                    // Add optional fields only if not empty
-                    if (image) eventData.image = image;
-                    if (shopLink) eventData.shop_link = shopLink;
-                    if (buttonText) eventData.button_text = buttonText;
+                    // Add all fields (empty values will be stored as NULL)
+                    eventData.image = image;
+                    eventData.shop_link = shopLink;
+                    eventData.button_text = buttonText;
                     
                     console.log('Saving to Supabase:', eventData);
                     const { data, error } = await supabase
