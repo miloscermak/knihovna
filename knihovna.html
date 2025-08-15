@@ -738,7 +738,7 @@
                                     ${event.description}
                                 </p>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-sm text-gray-500">${event.shopLink ? 'Vstupenky dostupné' : 'Zdarma'}</span>
+                                    <!-- Removed status text for cleaner design -->
                                     <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 text-sm font-medium" onclick="event.stopPropagation(); showEventDetail(${event.id})">
                                         Více info
                                     </button>
@@ -1203,9 +1203,9 @@
                                 🎫 Koupit vstupenky
                             </a>
                         ` : ''}
-                        <button onclick="closeEventDetail()" class="inline-block bg-gray-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-700 transition-colors duration-200">
-                            ℹ️ Více info na místě
-                        </button>
+                        <span class="inline-block bg-gray-600 text-white px-8 py-3 rounded-lg font-bold">
+                            ${event.buttonText || 'ℹ️ Více info na místě'}
+                        </span>
                         <div class="mt-4 text-sm text-gray-500">
                             <p>📍 ${currentAddress}</p>
                             <p class="mt-1">Kapacita: 50 míst</p>
