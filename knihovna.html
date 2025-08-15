@@ -1063,6 +1063,8 @@
         async function saveAboutText() {
             const aboutText = document.getElementById('aboutText').value.trim();
             
+            console.log('Saving about text:', aboutText);
+            
             if (!aboutText) {
                 alert('Text nemůže být prázdný.');
                 return;
@@ -1084,11 +1086,14 @@
                     localStorage.setItem('aboutText', aboutText);
                 }
                 
-                // Update the about section
+                // Update the about section immediately
                 const aboutMainText = document.getElementById('aboutMainText');
                 if (aboutMainText) {
                     aboutMainText.textContent = aboutText;
                 }
+                
+                // Reload all content to ensure sync
+                await loadAllContent();
                 
                 alert('Text sekce "O nás" byl úspěšně uložen!');
                 
@@ -1096,11 +1101,14 @@
                 console.error('Error saving about text:', error);
                 localStorage.setItem('aboutText', aboutText);
                 
-                // Update the about section
+                // Update the about section immediately
                 const aboutMainText = document.getElementById('aboutMainText');
                 if (aboutMainText) {
                     aboutMainText.textContent = aboutText;
                 }
+                
+                // Reload all content to ensure sync
+                await loadAllContent();
                 
                 alert('Text byl uložen lokálně (Supabase nedostupný).');
             }
@@ -1416,12 +1424,15 @@
 
         // Load all content from Supabase
         async function loadAllContent() {
+            console.log('Loading all content from Supabase...');
             try {
                 const { data, error } = await supabase
                     .from('settings')
                     .select('*');
                     
                 if (error) throw error;
+                
+                console.log('Settings loaded:', data);
                 
                 if (data && data.length > 0) {
                     data.forEach(setting => {
@@ -1498,14 +1509,28 @@
                 }
             } catch (error) {
                 console.error('Error loading content:', error);
-                // Fallback values
+                
+                // Try to load from localStorage first
+                const storedAboutText = localStorage.getItem('aboutText');
+                if (storedAboutText) {
+                    const aboutMainText = document.getElementById('aboutMainText');
+                    if (aboutMainText) {
+                        aboutMainText.textContent = storedAboutText;
+                    }
+                    const aboutTextAdmin = document.getElementById('aboutText');
+                    if (aboutTextAdmin) {
+                        aboutTextAdmin.value = storedAboutText;
+                    }
+                }
+                
+                // Fallback values for other fields
                 const fallbacks = {
-                    aboutMainText: 'Knihovna Čermáka a Staňka je multifunkční kulturní klub s kapacitou 50 míst. Nabízíme jedinečný prostor pro debaty, standup comedy, kvízy a nahrávání podcastů.',
+                    aboutMainText: storedAboutText || 'Knihovna Čermáka a Staňka je multifunkční kulturní klub s kapacitou 50 míst. Nabízíme jedinečný prostor pro debaty, standup comedy, kvízy a nahrávání podcastů.',
                     aboutDescription: 'Náš klub spojuje tradici literárních debat s moderními formáty zábavy. Máme vlastní podcastové studio a pravidelně pořádáme tematické večery.',
-                    openingHours: '<strong>Út–Čt:</strong> 18:00–23:00<br><strong>Pá–So:</strong> 18:00–01:00<br><strong>Ne–Po:</strong> Zavřeno',
-                    contactAddress: 'Národní 28<br>110 00 Praha 1',
-                    contactEmail: 'info@knihovnacs.cz',
-                    contactPhone: '+420 234 567 890'
+                    openingHours: localStorage.getItem('opening_hours') || '<strong>Út–Čt:</strong> 18:00–23:00<br><strong>Pá–So:</strong> 18:00–01:00<br><strong>Ne–Po:</strong> Zavřeno',
+                    contactAddress: localStorage.getItem('contact_address') || 'Národní 28<br>110 00 Praha 1',
+                    contactEmail: localStorage.getItem('contact_email') || 'info@knihovnacs.cz',
+                    contactPhone: localStorage.getItem('contact_phone') || '+420 234 567 890'
                 };
                 
                 Object.entries(fallbacks).forEach(([id, value]) => {
