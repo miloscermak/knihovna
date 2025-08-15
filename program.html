@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Program akcí - Knihovna Čermáka a Staňka</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Základní styly */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f9fafb;
+        }
+        
+        /* Event cards hover effect */
+        .event-card {
+            transition: all 0.3s ease;
+        }
+        
+        .event-card:hover {
+            transform: translateY(-4px);
+        }
+        
+        /* Filter buttons */
+        .filter-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn.active {
+            background-color: #dc2626;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-black py-4 px-4 sm:px-6 lg:px-8 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="knihovna.html" class="text-white text-xl font-bold">← Zpět na hlavní stránku</a>
+            <div class="text-white">
+                <span class="font-bold">Knihovna Čermáka a Staňka</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-b from-gray-100 to-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-black text-center mb-4">
+                Kompletní program akcí
+            </h1>
+            <p class="text-xl text-gray-600 text-center max-w-3xl mx-auto">
+                Prohlédněte si všechny naše aktuální i minulé akce. Najdete zde kompletní archiv stand-upů, diskuzí, workshopů a dalších událostí.
+            </p>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="py-8 bg-white border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button class="filter-btn active px-6 py-2 rounded-full border-2 border-gray-300 hover:border-red-600 font-medium" data-filter="all">
+                    Všechny akce
+                </button>
+                <button class="filter-btn px-6 py-2 rounded-full border-2 border-gray-300 hover:border-red-600 font-medium" data-filter="upcoming">
+                    Nadcházející
+                </button>
+                <button class="filter-btn px-6 py-2 rounded-full border-2 border-gray-300 hover:border-red-600 font-medium" data-filter="past">
+                    Proběhlé
+                </button>
+            </div>
+            <div class="mt-4 text-center">
+                <span class="text-gray-600">Celkem akcí: <span id="eventCount" class="font-bold">0</span></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Grid -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div id="eventsGrid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Events will be loaded here -->
+            </div>
+            
+            <!-- No events message -->
+            <div id="noEventsMessage" class="text-center py-12" style="display: none;">
+                <p class="text-gray-500 text-lg">Žádné akce k zobrazení</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Event Detail Modal -->
+    <div id="eventDetail" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+                <h3 id="eventDetailTitle" class="text-2xl font-bold"></h3>
+                <button onclick="closeEventDetail()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="eventDetailContent" class="p-6">
+                <!-- Event details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2024 Knihovna Čermáka a Staňka. Všechna práva vyhrazena.</p>
+        </div>
+    </footer>
+
+    <!-- Supabase & Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://eyfgtagudbvzorrdntdf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5Zmd0YWd1ZGJ2em9ycmRudGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMxNjE2MjEsImV4cCI6MjA0ODczNzYyMX0.xNJmWGpDbaVRIKkEPTlHbFSVnMVhWKGYTiXjbpidRSE';
+        
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let allEvents = [];
+        let currentFilter = 'all';
+
+        // Load events
+        async function loadEvents() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('events')
+                    .select('*')
+                    .order('date', { ascending: false });
+                    
+                if (error) throw error;
+                
+                allEvents = (data || []).map(event => ({
+                    id: event.id,
+                    title: event.title,
+                    date: event.date,
+                    time: event.time,
+                    description: event.description,
+                    image: event.image,
+                    shopLink: event.shop_link || '',
+                    buttonText: event.button_text || ''
+                }));
+                
+                console.log(`Loaded ${allEvents.length} events`);
+                filterAndRenderEvents();
+                
+            } catch (error) {
+                console.error('Error loading events:', error);
+                // Try localStorage fallback
+                const storedEvents = localStorage.getItem('events');
+                if (storedEvents) {
+                    allEvents = JSON.parse(storedEvents);
+                    filterAndRenderEvents();
+                }
+            }
+        }
+
+        // Filter and render events
+        function filterAndRenderEvents() {
+            const now = new Date();
+            let filteredEvents = [...allEvents];
+            
+            if (currentFilter === 'upcoming') {
+                filteredEvents = allEvents.filter(event => {
+                    const eventDate = new Date(event.date + 'T' + event.time);
+                    return eventDate >= now;
+                });
+            } else if (currentFilter === 'past') {
+                filteredEvents = allEvents.filter(event => {
+                    const eventDate = new Date(event.date + 'T' + event.time);
+                    return eventDate < now;
+                });
+            }
+            
+            // Sort by date
+            filteredEvents.sort((a, b) => {
+                const dateA = new Date(a.date + 'T' + a.time);
+                const dateB = new Date(b.date + 'T' + b.time);
+                return currentFilter === 'past' ? dateB - dateA : dateA - dateB;
+            });
+            
+            renderEvents(filteredEvents);
+            updateEventCount(filteredEvents.length);
+        }
+
+        // Render events
+        function renderEvents(events) {
+            const eventsGrid = document.getElementById('eventsGrid');
+            const noEventsMessage = document.getElementById('noEventsMessage');
+            
+            if (events.length === 0) {
+                eventsGrid.style.display = 'none';
+                noEventsMessage.style.display = 'block';
+                return;
+            }
+            
+            eventsGrid.style.display = 'grid';
+            noEventsMessage.style.display = 'none';
+            
+            const monthNames = ['ledna', 'února', 'března', 'dubna', 'května', 'června', 
+                               'července', 'srpna', 'září', 'října', 'listopadu', 'prosince'];
+            
+            eventsGrid.innerHTML = events.map(event => {
+                const eventDate = new Date(event.date);
+                const isPast = eventDate < new Date();
+                const day = eventDate.getDate();
+                const month = monthNames[eventDate.getMonth()];
+                const time = event.time.substring(0, 5);
+                
+                return `
+                    <div class="event-card bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer ${isPast ? 'opacity-75' : ''}" 
+                         onclick="showEventDetail(${event.id})">
+                        ${event.image ? `
+                            <img src="${event.image}" alt="${event.title}" class="w-full h-48 object-cover">
+                        ` : `
+                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                                <span class="text-gray-400 text-4xl">📅</span>
+                            </div>
+                        `}
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-3">
+                                <h3 class="text-xl font-bold text-black">${event.title}</h3>
+                                ${isPast ? '<span class="text-sm text-gray-500">Proběhlo</span>' : ''}
+                            </div>
+                            <p class="text-gray-600 mb-4">${event.description.substring(0, 100)}...</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-red-600 font-bold">${day}. ${month} v ${time}</span>
+                                <span class="text-sm text-gray-500">${event.buttonText || 'Více info'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update event count
+        function updateEventCount(count) {
+            document.getElementById('eventCount').textContent = count;
+        }
+
+        // Show event detail
+        function showEventDetail(eventId) {
+            const event = allEvents.find(e => e.id === eventId);
+            if (!event) return;
+            
+            const eventDate = new Date(event.date);
+            const monthNames = ['ledna', 'února', 'března', 'dubna', 'května', 'června', 
+                               'července', 'srpna', 'září', 'října', 'listopadu', 'prosince'];
+            const day = eventDate.getDate();
+            const month = monthNames[eventDate.getMonth()];
+            const time = event.time.substring(0, 5);
+            
+            document.getElementById('eventDetailTitle').textContent = event.title;
+            document.getElementById('eventDetailContent').innerHTML = `
+                ${event.image ? `
+                    <img src="${event.image}" alt="${event.title}" class="w-full h-64 object-cover rounded-lg mb-6">
+                ` : ''}
+                <div class="prose max-w-none">
+                    <p class="text-gray-600 mb-4">${event.description}</p>
+                    <div class="border-t pt-4 mt-6">
+                        <p class="text-lg"><strong>Datum:</strong> ${day}. ${month}</p>
+                        <p class="text-lg"><strong>Čas:</strong> ${time}</p>
+                    </div>
+                    ${event.shopLink ? `
+                        <div class="mt-6">
+                            <a href="${event.shopLink}" target="_blank" rel="noopener noreferrer" 
+                               class="inline-block bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700 transition-colors duration-200">
+                                ${event.buttonText || 'Koupit vstupenky'}
+                            </a>
+                        </div>
+                    ` : `
+                        <div class="mt-6">
+                            <span class="inline-block bg-gray-600 text-white px-8 py-3 rounded-lg font-bold">
+                                ${event.buttonText || 'ℹ️ Více info na místě'}
+                            </span>
+                        </div>
+                    `}
+                </div>
+            `;
+            
+            document.getElementById('eventDetail').style.display = 'flex';
+        }
+
+        // Close event detail
+        function closeEventDetail() {
+            document.getElementById('eventDetail').style.display = 'none';
+        }
+
+        // Filter button handlers
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                filterAndRenderEvents();
+            });
+        });
+
+        // Close modal on background click
+        document.getElementById('eventDetail').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEventDetail();
+            }
+        });
+
+        // Initialize
+        loadEvents();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadEvents, 30000);
+    </script>
+</body>
+</html>

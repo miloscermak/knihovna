@@ -872,8 +872,10 @@
                 return;
             }
             
-            // Sort events by date
-            const sortedEvents = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
+            // Sort events by date and limit to 10 upcoming events
+            const sortedEvents = [...events]
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .slice(0, 10);
 
             // Group events by date
             const eventsByDate = {};
@@ -929,6 +931,17 @@
                     </div>
                 `;
             });
+
+            // Add "Show all events" button if there are more than 10 events
+            if (events.length > 10) {
+                html += `
+                    <div class="text-center py-8">
+                        <a href="program.html" class="inline-block bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-colors duration-200 font-bold">
+                            Zobrazit všechny akce (${events.length})
+                        </a>
+                    </div>
+                `;
+            }
 
             eventsList.innerHTML = html || '<div class="text-center py-12"><p class="text-gray-500 text-lg">Žádné události v této kategorii</p></div>';
         }
@@ -1284,7 +1297,10 @@
                 return;
             }
             
-            galleryGrid.innerHTML = galleryImages.map(image => `
+            // Show only first 12 images (3 rows of 4)
+            const limitedImages = galleryImages.slice(0, 12);
+            
+            let galleryHtml = limitedImages.map(image => `
                 <div class="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <img 
                         src="${image.url}" 
@@ -1299,6 +1315,19 @@
                     </div>
                 </div>
             `).join('');
+            
+            // Add "Show all photos" button if there are more than 12 photos
+            if (galleryImages.length > 12) {
+                galleryHtml += `
+                    <div class="col-span-full flex justify-center py-8">
+                        <a href="galerie.html" class="inline-block bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-colors duration-200 font-bold">
+                            Zobrazit více fotek (${galleryImages.length})
+                        </a>
+                    </div>
+                `;
+            }
+            
+            galleryGrid.innerHTML = galleryHtml;
         }
 
         function renderGalleryAdminList() {
