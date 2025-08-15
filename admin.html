@@ -684,7 +684,7 @@
                 return;
             }
             
-            console.log('Adding event with data:', {title, type, date, time, description, image, shopLink});
+            console.log('Adding event with data:', {title, type, date, time, description, image, shopLink, buttonText});
             
             // Check if date is not too far in the past
             const eventDate = new Date(date + 'T' + time);
@@ -764,19 +764,31 @@
                     if (shopLink) eventData.shop_link = shopLink;
                     if (buttonText) eventData.button_text = buttonText;
                     
+                    console.log('Saving to Supabase:', eventData);
                     const { data, error } = await supabase
                         .from('events')
                         .insert([eventData]);
                         
                     if (error) {
-                        console.log('Supabase save failed, saving to localStorage:', error);
+                        console.error('Supabase save failed:', error);
+                        showAlert('danger', 'Chyba při ukládání do databáze: ' + (error.message || 'Neznámá chyba'), 'eventError');
                         // Save to localStorage as fallback
+                        const newEvent = {
+                            id: Date.now(),
+                            title: title,
+                            type: type,
+                            date: date,
+                            time: time,
+                            description: description,
+                            image: image,
+                            shopLink: shopLink,
+                            buttonText: buttonText
+                        };
                         events.push(newEvent);
                         localStorage.setItem('events', JSON.stringify(events));
                     } else {
-                        // Also save to localStorage for immediate use
-                        events.push(newEvent);
-                        localStorage.setItem('events', JSON.stringify(events));
+                        console.log('Event saved to Supabase successfully:', data);
+                        // Don't duplicate in localStorage, just reload from Supabase
                     }
                     
                     // Reset form
