@@ -407,6 +407,11 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Link na eshop/vstupenky</label>
                         <input type="url" id="eventShopLink" placeholder="https://obchod.example.com/udalost" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Text tlačítka (když chybí link)</label>
+                        <input type="text" id="eventButtonText" placeholder="Vstup zdarma" maxlength="50" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                        <p class="text-xs text-gray-500 mt-1">Např: "Vstup zdarma", "Prodej ještě nezahájen", "Vyprodáno" atd.</p>
+                    </div>
                     <button type="submit" class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium">Přidat událost</button>
                 </form>
             </div>
@@ -621,7 +626,8 @@
                     time: event.time,
                     description: event.description,
                     image: event.image,
-                    shopLink: event.shop_link || ''
+                    shopLink: event.shop_link || '',
+                    buttonText: event.button_text || ''
                 }));
                 
                 events = transformedEvents;
@@ -793,6 +799,7 @@
             const description = document.getElementById('eventDescription').value.trim();
             const image = document.getElementById('eventImage').value.trim();
             const shopLink = document.getElementById('eventShopLink').value.trim();
+            const buttonText = document.getElementById('eventButtonText').value.trim();
             
             // Validation
             if (!title || !date || !time || !description) {
@@ -817,7 +824,8 @@
                 time: time,
                 description: description,
                 image: image,
-                shopLink: shopLink
+                shopLink: shopLink,
+                buttonText: buttonText
             };
 
             events.push(newEvent);
@@ -1164,7 +1172,7 @@
                             </a>
                         ` : `
                             <span class="inline-block bg-green-600 text-white px-8 py-3 rounded-lg font-bold">
-                                🆓 Vstup zdarma
+                                ${event.buttonText || '🆓 Vstup zdarma'}
                             </span>
                         `}
                         <div class="mt-4 text-sm text-gray-500">

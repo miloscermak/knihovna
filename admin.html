@@ -366,6 +366,11 @@
                         <label>Link na eshop/vstupenky</label>
                         <input type="url" id="eventShopLink" placeholder="https://obchod.example.com/udalost">
                     </div>
+                    <div class="form-group">
+                        <label>Text tlačítka (když chybí link)</label>
+                        <input type="text" id="eventButtonText" placeholder="Vstup zdarma" maxlength="50">
+                        <small style="color: var(--gray-medium); font-size: 0.8rem;">Např: "Vstup zdarma", "Prodej ještě nezahájen", "Vyprodáno" atd.</small>
+                    </div>
                     <button type="submit" class="btn btn-primary">Přidat událost</button>
                 </form>
             </div>
@@ -671,6 +676,7 @@
             const description = document.getElementById('eventDescription').value.trim();
             const image = document.getElementById('eventImage').value.trim();
             const shopLink = document.getElementById('eventShopLink').value.trim();
+            const buttonText = document.getElementById('eventButtonText').value.trim();
             
             // Validation
             if (!title || !date || !time || !description) {
@@ -707,6 +713,7 @@
                     // Add optional fields only if not empty
                     if (image) updateData.image = image;
                     if (shopLink) updateData.shop_link = shopLink;
+                    if (buttonText) updateData.button_text = buttonText;
                     
                     const { error } = await supabase
                         .from('events')
@@ -755,6 +762,7 @@
                     // Add optional fields only if not empty
                     if (image) eventData.image = image;
                     if (shopLink) eventData.shop_link = shopLink;
+                    if (buttonText) eventData.button_text = buttonText;
                     
                     const { data, error } = await supabase
                         .from('events')
@@ -836,6 +844,7 @@
             document.getElementById('eventDescription').value = event.description;
             document.getElementById('eventImage').value = event.image || '';
             document.getElementById('eventShopLink').value = event.shopLink || '';
+            document.getElementById('eventButtonText').value = event.buttonText || '';
             
             // Change form to edit mode
             const form = document.getElementById('eventForm');
