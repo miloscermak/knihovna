@@ -5,7 +5,7 @@ Kompletní dokumentace současného stavu webové stránky a všech implementova
 ## 🌐 Živé odkazy
 
 - **Hlavní web**: https://miloscermak.github.io/knihovna/
-- **Admin panel**: https://miloscermak.github.io/knihovna/admin.html (heslo: `knihovna2024`)
+- **Admin panel**: https://miloscermak.github.io/knihovna/admin-secure.html (🔒 Supabase Auth)
 - **Archiv akcí**: https://miloscermak.github.io/knihovna/program.html
 - **Archiv galerie**: https://miloscermak.github.io/knihovna/galerie.html
 
@@ -14,7 +14,8 @@ Kompletní dokumentace současného stavu webové stránky a všech implementova
 ```
 knihovna/
 ├── knihovna.html          # Hlavní webová stránka
-├── admin.html             # Administrační panel
+├── admin.html             # Administrační panel (legacy)
+├── admin-secure.html      # Bezpečný admin s Supabase Auth
 ├── program.html           # Archiv všech akcí
 ├── galerie.html           # Archiv všech fotek
 ├── milos.avif            # Fotka Miloše Čermáka
@@ -22,7 +23,9 @@ knihovna/
 ├── README.md             # Základní dokumentace
 ├── CLAUDE.md             # Instrukce pro Claude Code
 ├── PRODUCTION-OVERVIEW.md # Tento dokument
+├── SUPABASE-AUTH-SETUP.md # Návod na nastavení bezpečné autentizace
 ├── instagram-*.md        # Návody pro Instagram integraci
+├── supabase-auth-setup.sql # SQL migrace pro Supabase Auth
 └── supabase-*.sql        # SQL migrace pro databázi
 ```
 
@@ -108,9 +111,12 @@ knihovna/
 - Počet fotek v galerii
 
 #### Bezpečnost
-- **Session-based auth** - sessionStorage
-- **Heslo**: `knihovna2024`
-- **Cache-busting** - Meta tagy proti cache problémům
+- **🚨 MIGRACE NA SUPABASE AUTH (26.8.2025)** 
+- **Nový admin**: admin-secure.html s plnou Supabase autentizací
+- **Starý admin**: admin.html (legacy, nedoporučeno pro produkci)
+- **Row Level Security** - RLS politiky na všech tabulkách
+- **Server-side auth** - Žádné hardcoded hesla v kódu
+- **Session management** - Automatické odhlašování při vypršení
 
 ### 📅 Archiv akcí (program.html)
 
@@ -245,9 +251,11 @@ git push origin main
 - **No sensitive data exposure** - Žádné tajné klíče v kódu
 
 ### Admin security
-- **Session-based auth** - Lokální autentifikace
-- **Cache protection** - Meta tagy proti cache
-- **Input validation** - Základní validace formulářů
+- **🔒 SUPABASE AUTH (NEW)** - Server-side autentizace
+- **Row Level Security** - Databázové políky pro ochranu dat
+- **JWT tokeny** - Secure session management
+- **Žádné hardcoded hesla** - Vše bezpečně uloženo v Supabase
+- **Legacy admin.html** - Stále funkční, ale nedoporučeno
 
 ## 📈 Budoucí možnosti rozšíření
 
@@ -272,8 +280,8 @@ git push origin main
 - **localStorage limits** - ~5MB limit na doménu
 
 ### Funkční
-- **Admin password** - Jednoduchá autentifikace
-- **No user roles** - Jeden admin přístup
+- **~~Admin password~~** - ✅ VYŘEŠENO: Implementován Supabase Auth
+- **No user roles** - Jeden admin přístup (možnost rozšíření)
 - **Manual image upload** - Přes URL, ne file upload
 
 ## 🛠️ Maintenance checklist
@@ -289,7 +297,8 @@ git push origin main
 - [ ] Update dokumentace
 
 ### Podle potřeby
-- [ ] Změna admin hesla
+- [ ] ~~Změna admin hesla~~ → Nyní přes Supabase dashboard
+- [ ] Přidání nových admin uživatelů přes Supabase Auth
 - [ ] Přidání nových funkcí
 - [ ] Design updates
 
@@ -302,9 +311,24 @@ git push origin main
 ### Dokumentace
 - **README.md** - Základní info
 - **CLAUDE.md** - Instrukce pro AI asistenta
+- **SUPABASE-AUTH-SETUP.md** - Návod na bezpečnou autentizaci
 - **instagram-*.md** - Instagram integrace návody
+
+## 🆕 Nedavné změny (26.8.2025)
+
+### ✅ Implementace Supabase Auth
+- **Bezpečnost**: Odstraněno hardcoded heslo `knihovna2024` z kódu
+- **Nový admin panel**: `admin-secure.html` s plnou Supabase autentizací
+- **SQL migrace**: Row Level Security políky pro všechny tabulky
+- **Session management**: Automatické odhlašování a refresh tokenů
+- **Dokumentace**: Kompletní návod v `SUPABASE-AUTH-SETUP.md`
+
+### 🔄 Migrace
+- **Hlavní stránka**: Admin gear a Ctrl+Shift+A nyní přesměrovává na secure admin
+- **Legacy admin**: `admin.html` stále funkční pro zpětnou kompatibilitu
+- **Production ready**: Bezpečné pro veřejné nasazení
 
 ---
 
-*Posledni update: Prosinec 2024*
-*Status: ✅ Production Ready*
+*Posledni update: 26. srpna 2025*
+*Status: ✅ Production Ready + 🔒 Security Enhanced*
