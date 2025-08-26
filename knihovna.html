@@ -655,14 +655,10 @@
             observer.observe(el);
         });
 
-        // Admin panel toggle with password protection
+        // Admin panel toggle - redirect to secure admin
         document.getElementById('adminToggle').addEventListener('click', () => {
-            const password = prompt('Zadejte heslo administrátora:');
-            if (password === 'knihovna2024') {
-                const adminPanel = document.getElementById('adminPanel');
-                adminPanel.classList.remove('translate-x-full');
-            } else if (password !== null) {
-                alert('Nesprávné heslo!');
+            if (confirm('Chcete přejít do administrace?')) {
+                window.location.href = 'admin-secure.html';
             }
         });
 
@@ -1687,12 +1683,8 @@
         // Add keyboard shortcut for admin panel (Ctrl + Shift + A)
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-                const password = prompt('Zadejte heslo administrátora:');
-                if (password === 'knihovna2024') {
-                    const adminPanel = document.getElementById('adminPanel');
-                    adminPanel.classList.remove('translate-x-full');
-                } else if (password !== null) {
-                    alert('Nesprávné heslo!');
+                if (confirm('Chcete přejít do administrace?')) {
+                    window.location.href = 'admin-secure.html';
                 }
             }
         });
