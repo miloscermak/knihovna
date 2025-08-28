@@ -717,7 +717,20 @@
                 }
                 
                 console.log('Events loaded:', data);
-                events = data || [];
+                
+                // Transform Supabase data to match the format expected by admin panel
+                const transformedEvents = (data || []).map(event => ({
+                    id: event.id,
+                    title: event.title,
+                    date: event.date,
+                    time: event.time,
+                    description: event.description,
+                    image: event.image,
+                    shopLink: event.shop_link || '',
+                    buttonText: event.button_text || ''
+                }));
+                
+                events = transformedEvents;
                 renderEvents();
             } catch (error) {
                 console.error('Error loading events:', error);
