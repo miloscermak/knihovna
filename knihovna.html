@@ -1351,6 +1351,9 @@
                 return;
             }
             
+            // Update URL
+            window.location.hash = `udalost/${eventId}`;
+            
             const eventDate = new Date(event.date);
             const formattedDate = eventDate.toLocaleDateString('cs-CZ', { 
                 weekday: 'long', 
@@ -1403,6 +1406,9 @@
                         <span class="inline-block bg-gray-600 text-white px-8 py-3 rounded-lg font-bold">
                             ${event.buttonText || 'ℹ️ Více info na místě'}
                         </span>
+                        <button onclick="shareEvent(${event.id})" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors duration-200 ml-2">
+                            📤 Sdílet
+                        </button>
                         <div class="mt-4 text-sm text-gray-500">
                             <p>📍 ${currentAddress}</p>
                             <p class="mt-1">Kapacita: 50 míst</p>
@@ -1419,6 +1425,11 @@
         function closeEventDetail() {
             document.getElementById('eventModal').classList.add('hidden');
             document.body.style.overflow = 'auto';
+            
+            // Clear the hash from URL if it's an event
+            if (window.location.hash.startsWith('#udalost/')) {
+                history.pushState("", document.title, window.location.pathname + window.location.search);
+            }
         }
         
         // Close modal when clicking outside
@@ -1434,6 +1445,84 @@
                 closeEventDetail();
             }
         });
+
+        // Share event function
+        function shareEvent(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+            
+            const url = `${window.location.origin}${window.location.pathname}#udalost/${eventId}`;
+            const shareText = `${event.title} - ${new Date(event.date).toLocaleDateString('cs-CZ')} v ${event.time.slice(0, 5)}`;
+            
+            // Try native share API first
+            if (navigator.share) {
+                navigator.share({
+                    title: event.title,
+                    text: shareText,
+                    url: url
+                }).catch(err => {
+                    // If sharing fails, copy to clipboard
+                    copyToClipboard(url);
+                });
+            } else {
+                // Fallback to copying URL
+                copyToClipboard(url);
+            }
+        }
+        
+        // Copy to clipboard helper
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Odkaz byl zkopírován do schránky!');
+                }).catch(err => {
+                    fallbackCopyToClipboard(text);
+                });
+            } else {
+                fallbackCopyToClipboard(text);
+            }
+        }
+        
+        // Fallback copy method for older browsers
+        function fallbackCopyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert('Odkaz byl zkopírován do schránky!');
+            } catch (err) {
+                alert('Nepodařilo se zkopírovat odkaz. URL: ' + text);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // URL routing for events
+        function handleHashChange() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#udalost/')) {
+                const eventId = parseInt(hash.split('/')[1]);
+                if (eventId) {
+                    // Wait for events to load if not ready
+                    if (events.length === 0) {
+                        setTimeout(() => handleHashChange(), 100);
+                        return;
+                    }
+                    showEventDetail(eventId);
+                }
+            } else {
+                // Close modal if no event in URL
+                closeEventDetail();
+            }
+        }
+        
+        // Listen for hash changes
+        window.addEventListener('hashchange', handleHashChange);
+        window.addEventListener('load', handleHashChange);
 
         // Load all content from Supabase
         async function loadAllContent() {
