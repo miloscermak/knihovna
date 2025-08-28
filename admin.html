@@ -716,21 +716,27 @@
                     throw error;
                 }
                 
-                console.log('Events loaded:', data);
+                console.log('Raw events from Supabase:', data);
+                console.log('Number of events from Supabase:', data ? data.length : 0);
                 
                 // Transform Supabase data to match the format expected by admin panel
-                const transformedEvents = (data || []).map(event => ({
-                    id: event.id,
-                    title: event.title,
-                    date: event.date,
-                    time: event.time,
-                    description: event.description,
-                    image: event.image,
-                    shopLink: event.shop_link || '',
-                    buttonText: event.button_text || ''
-                }));
+                const transformedEvents = (data || []).map(event => {
+                    console.log('Transforming event:', event.title, 'ID:', event.id);
+                    return {
+                        id: event.id,
+                        title: event.title,
+                        date: event.date,
+                        time: event.time,
+                        description: event.description,
+                        image: event.image,
+                        shopLink: event.shop_link || '',
+                        buttonText: event.button_text || ''
+                    };
+                });
                 
                 events = transformedEvents;
+                console.log('Final events array in admin:', events);
+                console.log('Event titles:', events.map(e => e.title));
                 renderEvents();
             } catch (error) {
                 console.error('Error loading events:', error);
@@ -765,9 +771,13 @@
         }
         
         function renderEvents() {
+            console.log('renderEvents called with', events.length, 'events');
+            console.log('Events to render:', events.map(e => ({ id: e.id, title: e.title })));
+            
             const eventsList = document.getElementById('eventsList');
             
             if (events.length === 0) {
+                console.log('No events to display');
                 eventsList.innerHTML = '<p style="text-align: center; color: var(--gray-medium); padding: 2rem;">Zatím nejsou přidané žádné události</p>';
                 return;
             }
