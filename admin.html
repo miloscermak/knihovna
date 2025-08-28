@@ -494,6 +494,63 @@
             </div>
 
             <!-- Newsletter Subscribers -->
+            <!-- Stripe Payment Management -->
+            <div class="section">
+                <h2>🎫 Správa prodeje vstupenek</h2>
+                <div class="alert alert-info">
+                    <p>Zde můžete zapnout/vypnout prodej vstupenek a spravovat typy vstupenek pro jednotlivé události.</p>
+                </div>
+                <div class="alert alert-success" id="stripeAlert" style="display: none;"></div>
+                <div class="alert alert-danger" id="stripeError" style="display: none;"></div>
+                
+                <!-- Toggle ticket sales -->
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="ticketSalesToggle" onchange="toggleTicketSales()">
+                        <strong>Povolit prodej vstupenek (Stripe)</strong>
+                    </label>
+                    <small style="color: var(--gray-medium);">Zapněte pro aktivaci prodeje vstupenek na webu</small>
+                </div>
+
+                <!-- Event selection for ticket management -->
+                <div class="form-group">
+                    <label for="eventSelectTickets">Vyberte událost pro správu vstupenek:</label>
+                    <select id="eventSelectTickets" onchange="loadEventTicketTypes()" class="form-control">
+                        <option value="">-- Vyberte událost --</option>
+                    </select>
+                </div>
+
+                <!-- Ticket types for selected event -->
+                <div id="ticketTypesContainer" style="display: none;">
+                    <h3>Typy vstupenek</h3>
+                    <div id="ticketTypesList"></div>
+                    
+                    <!-- Add new ticket type -->
+                    <div style="border: 2px dashed var(--gray-medium); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                        <h4>Přidat nový typ vstupenky</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="ticketName">Název</label>
+                                <input type="text" id="ticketName" placeholder="např. Standardní, VIP, Student" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="ticketPrice">Cena (Kč)</label>
+                                <input type="number" id="ticketPrice" placeholder="250" class="form-control" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="ticketMaxQuantity">Maximální počet</label>
+                                <input type="number" id="ticketMaxQuantity" placeholder="50" class="form-control" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="ticketDescription">Popis (volitelný)</label>
+                                <input type="text" id="ticketDescription" placeholder="Popis typu vstupenky" class="form-control">
+                            </div>
+                        </div>
+                        <button type="button" onclick="addTicketType()" class="btn btn-primary">Přidat typ vstupenky</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="section">
                 <h2>Newsletter - přihlášení</h2>
                 <div class="subscribers-list" id="subscribersList">
@@ -1439,6 +1496,7 @@
             await loadSubscribers();
             loadGalleryImages();
             await loadInstagramPhotos();
+            await initStripeManagement();
             updateStats();
         }
 
@@ -1469,6 +1527,230 @@
             }
         }
         
+        // Stripe ticket management functions
+        async function initStripeManagement() {
+            // Load current ticket sales status
+            await loadTicketSalesStatus();
+            
+            // Populate event select for ticket management
+            await populateEventSelectForTickets();
+        }
+        
+        async function loadTicketSalesStatus() {
+            try {
+                const { data, error } = await supabase
+                    .from('settings')
+                    .select('value')
+                    .eq('key', 'ticket_sales_enabled')
+                    .single();
+                
+                const ticketSalesToggle = document.getElementById('ticketSalesToggle');
+                if (data) {
+                    ticketSalesToggle.checked = data.value === 'true';
+                } else {
+                    ticketSalesToggle.checked = false;
+                }
+            } catch (error) {
+                console.log('Ticket sales status not found, defaulting to disabled');
+                document.getElementById('ticketSalesToggle').checked = false;
+            }
+        }
+        
+        async function toggleTicketSales() {
+            if (!isAuthenticated) return;
+            
+            const isEnabled = document.getElementById('ticketSalesToggle').checked;
+            
+            try {
+                const { error } = await supabase
+                    .from('settings')
+                    .upsert([{
+                        key: 'ticket_sales_enabled',
+                        value: isEnabled.toString()
+                    }]);
+                
+                if (error) throw error;
+                
+                showAlert('success', `Prodej vstupenek byl ${isEnabled ? 'zapnut' : 'vypnut'}.`, 'stripeAlert');
+                
+                // Inform user about main page update
+                if (isEnabled) {
+                    showAlert('success', 'Prodej vstupenek je nyní aktivní! Nezapomeňte také aktualizovat TICKET_SALES_ENABLED na true v hlavním souboru knihovna.html.', 'stripeAlert');
+                }
+                
+            } catch (error) {
+                console.error('Error toggling ticket sales:', error);
+                showAlert('danger', 'Chyba při změně nastavení: ' + error.message, 'stripeError');
+                // Revert checkbox
+                document.getElementById('ticketSalesToggle').checked = !isEnabled;
+            }
+        }
+        
+        async function populateEventSelectForTickets() {
+            const select = document.getElementById('eventSelectTickets');
+            select.innerHTML = '<option value="">-- Vyberte událost --</option>';
+            
+            events.forEach(event => {
+                const option = document.createElement('option');
+                option.value = event.id;
+                const eventDate = new Date(event.date).toLocaleDateString('cs-CZ');
+                option.textContent = `${event.title} (${eventDate})`;
+                select.appendChild(option);
+            });
+        }
+        
+        async function loadEventTicketTypes() {
+            const eventId = document.getElementById('eventSelectTickets').value;
+            const container = document.getElementById('ticketTypesContainer');
+            const listContainer = document.getElementById('ticketTypesList');
+            
+            if (!eventId) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'block';
+            
+            try {
+                const { data: ticketTypes, error } = await supabase
+                    .from('ticket_types')
+                    .select('*')
+                    .eq('event_id', eventId)
+                    .order('price', { ascending: true });
+                
+                if (error) throw error;
+                
+                if (!ticketTypes || ticketTypes.length === 0) {
+                    listContainer.innerHTML = '<p style="color: var(--gray-medium); font-style: italic;">Žádné typy vstupenek pro tuto událost.</p>';
+                    return;
+                }
+                
+                listContainer.innerHTML = ticketTypes.map(ticket => `
+                    <div style="border: 1px solid var(--gray-medium); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: white;">
+                        <div style="display: flex; justify-content: between; align-items: start;">
+                            <div style="flex: 1;">
+                                <h4 style="margin: 0 0 0.5rem 0; color: var(--primary-black);">${ticket.name}</h4>
+                                ${ticket.description ? `<p style="margin: 0 0 0.5rem 0; color: var(--gray-medium); font-size: 0.9rem;">${ticket.description}</p>` : ''}
+                                <p style="margin: 0; font-weight: bold; color: var(--accent);">${(ticket.price / 100).toFixed(0)} Kč</p>
+                                <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: var(--gray-medium);">
+                                    Max: ${ticket.max_quantity} ks | Prodáno: ${ticket.sold_quantity || 0} ks | 
+                                    Status: ${ticket.is_active ? 'Aktivní' : 'Neaktivní'}
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button onclick="toggleTicketType('${ticket.id}', ${!ticket.is_active})" class="btn ${ticket.is_active ? 'btn-warning' : 'btn-success'}" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                    ${ticket.is_active ? 'Deaktivovat' : 'Aktivovat'}
+                                </button>
+                                <button onclick="deleteTicketType('${ticket.id}')" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                    Smazat
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading ticket types:', error);
+                showAlert('danger', 'Chyba při načítání typů vstupenek: ' + error.message, 'stripeError');
+                listContainer.innerHTML = '<p style="color: var(--danger);">Chyba při načítání typů vstupenek.</p>';
+            }
+        }
+        
+        async function addTicketType() {
+            if (!isAuthenticated) return;
+            
+            const eventId = document.getElementById('eventSelectTickets').value;
+            const name = document.getElementById('ticketName').value.trim();
+            const price = parseInt(document.getElementById('ticketPrice').value);
+            const maxQuantity = parseInt(document.getElementById('ticketMaxQuantity').value);
+            const description = document.getElementById('ticketDescription').value.trim();
+            
+            if (!eventId) {
+                showAlert('danger', 'Nejprve vyberte událost.', 'stripeError');
+                return;
+            }
+            
+            if (!name || !price || !maxQuantity) {
+                showAlert('danger', 'Vyplňte všechna povinná pole (název, cena, max. počet).', 'stripeError');
+                return;
+            }
+            
+            try {
+                const { error } = await supabase
+                    .from('ticket_types')
+                    .insert([{
+                        event_id: eventId,
+                        name: name,
+                        price: price * 100, // Convert to cents
+                        description: description || null,
+                        max_quantity: maxQuantity,
+                        sold_quantity: 0,
+                        is_active: true
+                    }]);
+                
+                if (error) throw error;
+                
+                showAlert('success', `Typ vstupenky "${name}" byl úspěšně přidán.`, 'stripeAlert');
+                
+                // Clear form
+                document.getElementById('ticketName').value = '';
+                document.getElementById('ticketPrice').value = '';
+                document.getElementById('ticketMaxQuantity').value = '';
+                document.getElementById('ticketDescription').value = '';
+                
+                // Reload ticket types
+                await loadEventTicketTypes();
+                
+            } catch (error) {
+                console.error('Error adding ticket type:', error);
+                showAlert('danger', 'Chyba při přidávání typu vstupenky: ' + error.message, 'stripeError');
+            }
+        }
+        
+        async function toggleTicketType(ticketId, newStatus) {
+            if (!isAuthenticated) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('ticket_types')
+                    .update({ is_active: newStatus })
+                    .eq('id', ticketId);
+                
+                if (error) throw error;
+                
+                showAlert('success', `Typ vstupenky byl ${newStatus ? 'aktivován' : 'deaktivován'}.`, 'stripeAlert');
+                await loadEventTicketTypes();
+                
+            } catch (error) {
+                console.error('Error toggling ticket type:', error);
+                showAlert('danger', 'Chyba při změně stavu: ' + error.message, 'stripeError');
+            }
+        }
+        
+        async function deleteTicketType(ticketId) {
+            if (!isAuthenticated) return;
+            
+            if (!confirm('Opravdu chcete smazat tento typ vstupenky? Tato akce je nevratná.')) {
+                return;
+            }
+            
+            try {
+                const { error } = await supabase
+                    .from('ticket_types')
+                    .delete()
+                    .eq('id', ticketId);
+                
+                if (error) throw error;
+                
+                showAlert('success', 'Typ vstupenky byl smazán.', 'stripeAlert');
+                await loadEventTicketTypes();
+                
+            } catch (error) {
+                console.error('Error deleting ticket type:', error);
+                showAlert('danger', 'Chyba při mazání typu vstupenky: ' + error.message, 'stripeError');
+            }
+        }
+
         // Listen for auth state changes
         supabase.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_OUT') {

@@ -607,8 +607,8 @@
         // Initialize Stripe - TODO: Replace with actual publishable key when ready for production
         const stripe = Stripe('pk_test_51QaHoKRw2M8c2eL6v4bZyGXzYvNXTqMHUoIjXwJDrE7BF1xKHXLKHFjRGvRmKXzYvNXTqMHUoIjXwJDrE7BF1xK');
         
-        // Ticket sales flag - set to true when ready to launch sales
-        const TICKET_SALES_ENABLED = false;
+        // Ticket sales flag - loaded from database
+        let TICKET_SALES_ENABLED = false;
         
         // Initialize data storage
         let events = [];
@@ -1686,6 +1686,25 @@
             }
         }
 
+        // Load ticket sales setting from database
+        async function loadTicketSalesSetting() {
+            try {
+                const { data, error } = await supabase
+                    .from('settings')
+                    .select('value')
+                    .eq('key', 'ticket_sales_enabled')
+                    .single();
+                
+                if (data) {
+                    TICKET_SALES_ENABLED = data.value === 'true';
+                    console.log('Ticket sales enabled:', TICKET_SALES_ENABLED);
+                }
+            } catch (error) {
+                console.log('Ticket sales setting not found, defaulting to false');
+                TICKET_SALES_ENABLED = false;
+            }
+        }
+
         // Load all content from Supabase
         async function loadAllContent() {
             console.log('Loading all content from Supabase...');
@@ -1918,6 +1937,7 @@
         async function initApp() {
             await loadEvents();
             await loadAllContent();
+            await loadTicketSalesSetting();
             await loadGalleryImages();
             await loadInstagramPhotos();
             if (typeof renderEventList === 'function') {
