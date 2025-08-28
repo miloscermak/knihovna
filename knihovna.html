@@ -664,10 +664,10 @@
             observer.observe(el);
         });
 
-        // Admin panel toggle - redirect to secure admin
+        // Admin panel toggle - redirect to admin
         document.getElementById('adminToggle').addEventListener('click', () => {
             if (confirm('Chcete přejít do administrace?')) {
-                window.location.href = 'admin-secure.html';
+                window.location.href = 'admin.html';
             }
         });
 
@@ -1988,7 +1988,7 @@
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.shiftKey && e.key === 'A') {
                 if (confirm('Chcete přejít do administrace?')) {
-                    window.location.href = 'admin-secure.html';
+                    window.location.href = 'admin.html';
                 }
             }
         });

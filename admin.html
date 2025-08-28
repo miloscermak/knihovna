@@ -58,16 +58,30 @@
             font-weight: 300;
         }
 
-        .back-link {
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-email {
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        .back-link, .logout-btn {
             color: var(--primary-white);
             text-decoration: none;
             padding: 0.5rem 1rem;
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 4px;
             transition: var(--transition);
+            cursor: pointer;
+            background: transparent;
+            font-size: 0.9rem;
         }
 
-        .back-link:hover {
+        .back-link:hover, .logout-btn:hover {
             background: var(--primary-white);
             color: var(--primary-black);
         }
@@ -289,16 +303,20 @@
     <!-- Login Form -->
     <div id="loginContainer" class="container" style="max-width: 400px; margin-top: 10vh;">
         <div class="header" style="text-align: center;">
-            <h1>Přihlášení</h1>
+            <h1>Přihlášení do administrace</h1>
         </div>
         <div style="padding: 2rem;">
             <div class="alert alert-danger" id="loginError"></div>
             <form id="loginForm">
                 <div class="form-group">
-                    <label>Heslo administrátora</label>
-                    <input type="password" id="adminPassword" required placeholder="Zadejte heslo..." autocomplete="current-password">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="Váš email" autocomplete="username">
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Přihlásit</button>
+                <div class="form-group">
+                    <label for="password">Heslo</label>
+                    <input type="password" id="password" name="password" required placeholder="Vaše heslo" autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary" id="loginBtn" style="width: 100%;">Přihlásit se</button>
             </form>
         </div>
     </div>
@@ -307,8 +325,8 @@
     <div id="adminContainer" class="container" style="display: none;">
         <div class="header">
             <h1>Administrace Knihovny Č&S</h1>
-            <div>
-                <button class="btn btn-danger" onclick="logout()" style="margin-right: 1rem;">Odhlásit</button>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="user-info"></div>
                 <a href="knihovna.html" class="back-link">← Zpět na web</a>
             </div>
         </div>
@@ -493,7 +511,7 @@
         // Supabase configuration
         const SUPABASE_URL = 'https://eyfgtagudbvzorrdntdf.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5Zmd0YWd1ZGJ2em9ycmRudGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4MzEwMDMsImV4cCI6MjA3MDQwNzAwM30.uw5k8YWuIzM2Q1e8dzwSKXJBlA_wViVdAvtue6Qx0A0';
-        const ADMIN_PASSWORD = 'knihovna2024';
+        // Admin password no longer used - using Supabase Auth
         
         // Initialize Supabase client with error handling
         let supabase;
@@ -524,50 +542,93 @@
             }, 5000);
         }
 
-        // Authentication
-        function checkAuth() {
-            const authStatus = sessionStorage.getItem('knihovna_admin_auth');
-            if (authStatus === 'true') {
+        // Authentication with Supabase
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
                 isAuthenticated = true;
-                showAdminPanel();
+                showAdminPanel(session.user);
                 return true;
+            } else {
+                isAuthenticated = false;
+                showLoginForm();
+                return false;
             }
-            showLoginForm();
-            return false;
         }
         
         function showLoginForm() {
             document.getElementById('loginContainer').style.display = 'block';
             document.getElementById('adminContainer').style.display = 'none';
-            document.getElementById('adminPassword').focus();
+            document.getElementById('email').focus();
         }
         
-        function showAdminPanel() {
+        function showAdminPanel(user) {
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('adminContainer').style.display = 'block';
-        }
-        
-        function logout() {
-            sessionStorage.removeItem('knihovna_admin_auth');
-            isAuthenticated = false;
-            showLoginForm();
-        }
-        
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const password = document.getElementById('adminPassword').value;
             
-            if (password === ADMIN_PASSWORD) {
-                sessionStorage.setItem('knihovna_admin_auth', 'true');
-                isAuthenticated = true;
-                showAdminPanel();
-                initAdmin();
-            } else {
-                showAlert('danger', 'Nesprávné heslo!', 'loginError');
-                document.getElementById('adminPassword').value = '';
-                document.getElementById('adminPassword').focus();
+            // Update user info in header if needed
+            const userInfo = document.querySelector('.user-info');
+            if (userInfo) {
+                userInfo.innerHTML = `
+                    <span class="user-email">${user.email}</span>
+                    <button class="logout-btn" onclick="handleLogout()">Odhlásit se</button>
+                `;
             }
-        });
+        }
+        
+        async function handleLogout() {
+            if (confirm('Opravdu se chcete odhlásit?')) {
+                try {
+                    await supabase.auth.signOut();
+                    isAuthenticated = false;
+                    showLoginForm();
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+            }
+        }
+        
+        // Handle login with Supabase Auth
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Přihlašování...';
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    console.error('Login error:', error);
+                    showAlert('danger', error.message || 'Nesprávné přihlašovací údaje', 'loginError');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Přihlásit se';
+                    return;
+                }
+
+                if (data.user) {
+                    isAuthenticated = true;
+                    showAdminPanel(data.user);
+                    await initAdmin();
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('danger', 'Chyba při přihlašování. Zkuste to prosím znovu.', 'loginError');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Přihlásit se';
+            }
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
         
         function updateStats() {
             document.getElementById('eventCount').textContent = events.length;
@@ -1407,6 +1468,13 @@
                 return false;
             }
         }
+        
+        // Listen for auth state changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_OUT') {
+                showLoginForm();
+            }
+        });
         
         // Start the app
         checkAuth();
