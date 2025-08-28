@@ -1411,7 +1411,7 @@
                         <h3 class="text-xl font-bold text-gray-900 mb-4">🎫 Vstupenky</h3>
                         <div id="ticket-types-${event.id}" class="space-y-3">
                             <!-- Tickets will be loaded here -->
-                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <div id="ticket-loading-${event.id}" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                                 <p class="text-gray-700 font-medium">
                                     ${TICKET_SALES_ENABLED ? 'Načítám dostupné vstupenky...' : 'Prodej vstupenek bude zahájen brzy'}
                                 </p>
@@ -1688,19 +1688,30 @@
 
         // Load ticket sales setting from database
         async function loadTicketSalesSetting() {
+            console.log('Loading ticket sales setting from database...');
             try {
                 const { data, error } = await supabase
                     .from('settings')
-                    .select('value')
-                    .eq('key', 'ticket_sales_enabled')
-                    .single();
+                    .select('*')
+                    .eq('key', 'ticket_sales_enabled');
                 
-                if (data) {
-                    TICKET_SALES_ENABLED = data.value === 'true';
-                    console.log('Ticket sales enabled:', TICKET_SALES_ENABLED);
+                console.log('Settings query result:', data, error);
+                
+                if (error) {
+                    console.error('Error loading ticket sales setting:', error);
+                    TICKET_SALES_ENABLED = false;
+                    return;
+                }
+                
+                if (data && data.length > 0) {
+                    TICKET_SALES_ENABLED = data[0].value === 'true';
+                    console.log('Ticket sales setting loaded:', data[0].value, '-> enabled:', TICKET_SALES_ENABLED);
+                } else {
+                    console.log('No ticket sales setting found, defaulting to false');
+                    TICKET_SALES_ENABLED = false;
                 }
             } catch (error) {
-                console.log('Ticket sales setting not found, defaulting to false');
+                console.error('Exception loading ticket sales setting:', error);
                 TICKET_SALES_ENABLED = false;
             }
         }

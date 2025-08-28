@@ -1588,22 +1588,33 @@
             if (!isAuthenticated) return;
             
             const isEnabled = document.getElementById('ticketSalesToggle').checked;
+            console.log('Toggling ticket sales to:', isEnabled);
             
             try {
-                const { error } = await supabase
+                const { data, error } = await supabase
                     .from('settings')
                     .upsert([{
                         key: 'ticket_sales_enabled',
                         value: isEnabled.toString()
-                    }]);
+                    }], {
+                        onConflict: 'key'
+                    })
+                    .select();
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase upsert error:', error);
+                    throw error;
+                }
+                
+                console.log('Settings upserted successfully:', data);
                 
                 showAlert('success', `Prodej vstupenek byl ${isEnabled ? 'zapnut' : 'vypnut'}.`, 'stripeAlert');
                 
-                // Inform user about main page update
+                // Inform user about refresh needed
                 if (isEnabled) {
-                    showAlert('success', 'Prodej vstupenek je nyní aktivní! Nezapomeňte také aktualizovat TICKET_SALES_ENABLED na true v hlavním souboru knihovna.html.', 'stripeAlert');
+                    showAlert('success', 'Prodej vstupenek je aktivní! Obnovte hlavní stránku (F5) aby se změna projevila.', 'stripeAlert');
+                } else {
+                    showAlert('success', 'Prodej vstupenek je vypnut. Obnovte hlavní stránku (F5) aby se změna projevila.', 'stripeAlert');
                 }
                 
             } catch (error) {
