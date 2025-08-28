@@ -45,6 +45,9 @@
 
 
     </style>
+    
+    <!-- Stripe JavaScript SDK -->
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body class="min-h-screen bg-gray-50">
     <!-- Navigation -->
@@ -600,6 +603,12 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5Zmd0YWd1ZGJ2em9ycmRudGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4MzEwMDMsImV4cCI6MjA3MDQwNzAwM30.uw5k8YWuIzM2Q1e8dzwSKXJBlA_wViVdAvtue6Qx0A0';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Initialize Stripe - TODO: Replace with actual publishable key when ready for production
+        const stripe = Stripe('pk_test_51QaHoKRw2M8c2eL6v4bZyGXzYvNXTqMHUoIjXwJDrE7BF1xKHXLKHFjRGvRmKXzYvNXTqMHUoIjXwJDrE7BF1xK');
+        
+        // Ticket sales flag - set to true when ready to launch sales
+        const TICKET_SALES_ENABLED = false;
         
         // Initialize data storage
         let events = [];
@@ -1397,21 +1406,26 @@
                         <p class="text-gray-700 leading-relaxed">${event.description}</p>
                     </div>
                     
-                    <div class="border-t pt-6">
-                        ${event.shopLink ? `
-                            <a href="${event.shopLink}" target="_blank" rel="noopener noreferrer" class="inline-block bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700 transition-colors duration-200 mr-4">
-                                🎫 Koupit vstupenky
-                            </a>
-                        ` : ''}
-                        <span class="inline-block bg-gray-600 text-white px-8 py-3 rounded-lg font-bold">
-                            ${event.buttonText || 'ℹ️ Více info na místě'}
-                        </span>
-                        <button onclick="shareEvent(${event.id})" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors duration-200 ml-2">
-                            📤 Sdílet
-                        </button>
-                        <div class="mt-4 text-sm text-gray-500">
-                            <p>📍 ${currentAddress}</p>
-                            <p class="mt-1">Kapacita: 50 míst</p>
+                    <!-- Ticket section -->
+                    <div class="border-t pt-6" id="ticket-section-${event.id}">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">🎫 Vstupenky</h3>
+                        <div id="ticket-types-${event.id}" class="space-y-3">
+                            <!-- Tickets will be loaded here -->
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                <p class="text-gray-700 font-medium">
+                                    ${TICKET_SALES_ENABLED ? 'Načítám dostupné vstupenky...' : 'Prodej vstupenek bude zahájen brzy'}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 pt-6 border-t">
+                            <button onclick="shareEvent(${event.id})" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors duration-200">
+                                📤 Sdílet událost
+                            </button>
+                            <div class="mt-4 text-sm text-gray-500">
+                                <p>📍 ${currentAddress}</p>
+                                <p class="mt-1">Kapacita: 50 míst</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1420,6 +1434,11 @@
             // Show modal
             document.getElementById('eventModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            
+            // Load ticket types if sales are enabled
+            if (TICKET_SALES_ENABLED) {
+                loadTicketTypes(event.id);
+            }
         }
         
         function closeEventDetail() {
@@ -1523,6 +1542,149 @@
         // Listen for hash changes
         window.addEventListener('hashchange', handleHashChange);
         window.addEventListener('load', handleHashChange);
+
+        // Ticket management functions
+        async function loadTicketTypes(eventId) {
+            if (!TICKET_SALES_ENABLED) {
+                return; // Don't load tickets if sales are disabled
+            }
+            
+            try {
+                const { data: ticketTypes, error } = await supabase
+                    .from('ticket_types')
+                    .select('*')
+                    .eq('event_id', eventId)
+                    .eq('is_active', true)
+                    .order('price', { ascending: true });
+
+                if (error) throw error;
+
+                const container = document.getElementById(`ticket-types-${eventId}`);
+                if (!container) return;
+                
+                if (!ticketTypes || ticketTypes.length === 0) {
+                    container.innerHTML = `
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <p class="text-gray-600">Vstupenky nejsou v prodeji</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = ticketTypes.map(ticketType => {
+                    const available = ticketType.max_quantity - ticketType.sold_quantity;
+                    const priceKc = (ticketType.price / 100).toFixed(0);
+                    
+                    return `
+                        <div class="border border-gray-200 rounded-lg p-4 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-semibold text-gray-900">${ticketType.name}</h4>
+                                ${ticketType.description ? `<p class="text-sm text-gray-600">${ticketType.description}</p>` : ''}
+                                <p class="text-lg font-bold text-red-600">${priceKc} Kč</p>
+                                <p class="text-xs text-gray-500">Zbývá: ${available} ks</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <select id="quantity-${ticketType.id}" class="border border-gray-300 rounded px-2 py-1 w-16">
+                                    ${Array.from({length: Math.min(available, 10)}, (_, i) => 
+                                        `<option value="${i+1}">${i+1}</option>`
+                                    ).join('')}
+                                </select>
+                                <button 
+                                    onclick="purchaseTicket('${eventId}', '${ticketType.id}')"
+                                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors ${available === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+                                    ${available === 0 ? 'disabled' : ''}
+                                >
+                                    ${available === 0 ? 'Vyprodáno' : 'Koupit'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Chyba při načítání vstupenek:', error);
+                const container = document.getElementById(`ticket-types-${eventId}`);
+                if (container) {
+                    container.innerHTML = `
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <p class="text-red-600">Chyba při načítání vstupenek. Zkuste to prosím později.</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Purchase ticket function
+        async function purchaseTicket(eventId, ticketTypeId) {
+            if (!TICKET_SALES_ENABLED) {
+                alert('Prodej vstupenek ještě nebyl zahájen.');
+                return;
+            }
+            
+            const quantitySelect = document.getElementById(`quantity-${ticketTypeId}`);
+            const quantity = parseInt(quantitySelect.value);
+            const button = event.target;
+
+            try {
+                // Show loading state
+                button.innerHTML = 'Zpracovává se...';
+                button.disabled = true;
+
+                // Get event and ticket type details
+                const eventData = events.find(e => e.id === parseInt(eventId));
+                
+                const { data: ticketType, error: ticketError } = await supabase
+                    .from('ticket_types')
+                    .select('*')
+                    .eq('id', ticketTypeId)
+                    .single();
+
+                if (!eventData || ticketError || !ticketType) {
+                    throw new Error('Chyba při načítání dat');
+                }
+
+                // Create Stripe Checkout session
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout-session`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({
+                        eventId: eventId,
+                        ticketTypeId: ticketTypeId,
+                        quantity: quantity,
+                        eventName: eventData.title,
+                        ticketTypeName: ticketType.name,
+                        unitPrice: ticketType.price,
+                        totalAmount: ticketType.price * quantity,
+                        successUrl: window.location.origin + window.location.pathname + '?payment=success',
+                        cancelUrl: window.location.origin + window.location.pathname + '?payment=cancelled'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Chyba při vytváření platby');
+                }
+
+                const session = await response.json();
+
+                // Redirect to Stripe Checkout
+                const result = await stripe.redirectToCheckout({
+                    sessionId: session.sessionId
+                });
+
+                if (result.error) {
+                    throw new Error(result.error.message);
+                }
+
+            } catch (error) {
+                alert('Chyba při nákupu: ' + error.message);
+                // Reset button
+                button.innerHTML = 'Koupit';
+                button.disabled = false;
+            }
+        }
 
         // Load all content from Supabase
         async function loadAllContent() {
@@ -1711,6 +1873,47 @@
             renderGalleryAdminList();
         }
 
+        // Payment result functions
+        function showPaymentSuccess() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white p-6 rounded-lg max-w-md shadow-xl">
+                    <h3 class="text-2xl font-bold text-green-600 mb-3">✅ Platba úspěšná!</h3>
+                    <p class="text-gray-700 mb-4">Děkujeme za nákup vstupenky. Potvrzení a vstupenka byly odeslány na váš email.</p>
+                    <button onclick="this.closest('.fixed').remove()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded-lg transition-colors">
+                        Rozumím
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Auto-close after 10 seconds
+            setTimeout(() => {
+                modal.remove();
+            }, 10000);
+        }
+
+        function showPaymentCancelled() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white p-6 rounded-lg max-w-md shadow-xl">
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">❌ Platba byla zrušena</h3>
+                    <p class="text-gray-600 mb-4">Nákup nebyl dokončen. Můžete to zkusit znovu.</p>
+                    <button onclick="this.closest('.fixed').remove()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold px-6 py-2 rounded-lg transition-colors">
+                        Zavřít
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Auto-close after 5 seconds
+            setTimeout(() => {
+                modal.remove();
+            }, 5000);
+        }
+
         // Initialize the application
         async function initApp() {
             await loadEvents();
@@ -1719,6 +1922,18 @@
             await loadInstagramPhotos();
             if (typeof renderEventList === 'function') {
                 renderEventList();
+            }
+            
+            // Handle payment results
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('payment') === 'success') {
+                showPaymentSuccess();
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else if (urlParams.get('payment') === 'cancelled') {
+                showPaymentCancelled();
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
         
