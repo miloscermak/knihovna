@@ -605,13 +605,13 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // Initialize Stripe - TODO: Replace with actual publishable key when ready for production
-        const stripe = Stripe('pk_test_51QaHoKRw2M8c2eL6v4bZyGXzYvNXTqMHUoIjXwJDrE7BF1xKHXLKHFjRGvRmKXzYvNXTqMHUoIjXwJDrE7BF1xK');
+        const stripe = Stripe('pk_live_51PtBjpHaBu0y0SYT8Yp5eOWwB8fu2BG7KNWaPJPHh2PpfR2kqQrDpyDXtmYXQzfDWCZ4FBjaSGilELdOxo7OwjLi001lXPezb1');
         
         // Test mode flag - use Payment Links instead of Checkout Session
-        const USE_PAYMENT_LINKS = true;
+        const USE_PAYMENT_LINKS = false;
         
         // Ticket sales flag - loaded from database
-        let TICKET_SALES_ENABLED = false;
+        let TICKET_SALES_ENABLED = true;
         
         // Initialize data storage
         let events = [];
@@ -1681,7 +1681,7 @@
 
                 console.log('Sending to Edge Function:', requestData);
 
-                if (USE_PAYMENT_LINKS) {
+                if (!TICKET_SALES_ENABLED) {
                     // Alternative: Simulate payment for testing
                     console.log('Using test mode - simulating payment');
                     
