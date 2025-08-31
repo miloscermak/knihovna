@@ -726,7 +726,7 @@
                     .from('tickets')
                     .select('*')
                     .eq('status', 'paid')
-                    .order('purchase_date', { ascending: false });
+                    .order('created_at', { ascending: false });
 
                 if (ticketsError) throw ticketsError;
 
@@ -788,7 +788,7 @@
                                     </div>
                                     <div style="text-align: right;">
                                         <div style="font-size: 0.8rem; color: #666;">
-                                            ${new Date(ticket.purchase_date).toLocaleDateString('cs-CZ')}
+                                            ${new Date(ticket.created_at).toLocaleDateString('cs-CZ')}
                                         </div>
                                         <button onclick="showTicketQR('${ticket.id}')" class="btn btn-sm" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">
                                             QR kód
