@@ -1545,11 +1545,15 @@
 
         // Ticket management functions
         async function loadTicketTypes(eventId) {
+            console.log('loadTicketTypes called for event:', eventId, 'Sales enabled:', TICKET_SALES_ENABLED);
+            
             if (!TICKET_SALES_ENABLED) {
+                console.log('Ticket sales disabled, not loading tickets');
                 return; // Don't load tickets if sales are disabled
             }
             
             try {
+                console.log('Querying ticket_types for event_id:', eventId);
                 const { data: ticketTypes, error } = await supabase
                     .from('ticket_types')
                     .select('*')
@@ -1557,12 +1561,21 @@
                     .eq('is_active', true)
                     .order('price', { ascending: true });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Error loading ticket types:', error);
+                    throw error;
+                }
+
+                console.log('Ticket types loaded:', ticketTypes);
 
                 const container = document.getElementById(`ticket-types-${eventId}`);
-                if (!container) return;
+                if (!container) {
+                    console.error('Container not found for event:', eventId);
+                    return;
+                }
                 
                 if (!ticketTypes || ticketTypes.length === 0) {
+                    console.log('No ticket types found for event:', eventId);
                     container.innerHTML = `
                         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                             <p class="text-gray-600">Vstupenky nejsou v prodeji</p>
@@ -1570,6 +1583,8 @@
                     `;
                     return;
                 }
+                
+                console.log('Rendering', ticketTypes.length, 'ticket types');
 
                 container.innerHTML = ticketTypes.map(ticketType => {
                     const available = ticketType.max_quantity - ticketType.sold_quantity;
