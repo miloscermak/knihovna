@@ -1675,8 +1675,8 @@
                     ticketTypeName: ticketType.name,
                     unitPrice: ticketType.price,
                     totalAmount: ticketType.price * quantity,
-                    successUrl: window.location.origin + window.location.pathname + '?payment=success',
-                    cancelUrl: window.location.origin + window.location.pathname + '?payment=cancelled'
+                    successUrl: 'https://miloscermak.github.io/knihovna/knihovna.html?payment=success',
+                    cancelUrl: 'https://miloscermak.github.io/knihovna/knihovna.html?payment=cancelled'
                 };
 
                 console.log('Sending to Edge Function:', requestData);
