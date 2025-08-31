@@ -1631,6 +1631,8 @@
 
         // Purchase ticket function
         async function purchaseTicket(eventId, ticketTypeId) {
+            console.log('purchaseTicket called:', { eventId, ticketTypeId });
+            
             if (!TICKET_SALES_ENABLED) {
                 alert('Prodej vstupenek ještě nebyl zahájen.');
                 return;
@@ -1647,6 +1649,7 @@
 
                 // Get event and ticket type details
                 const eventData = events.find(e => e.id === parseInt(eventId));
+                console.log('Event data:', eventData);
                 
                 const { data: ticketType, error: ticketError } = await supabase
                     .from('ticket_types')
@@ -1654,9 +1657,26 @@
                     .eq('id', ticketTypeId)
                     .single();
 
+                console.log('Ticket type data:', ticketType, 'Error:', ticketError);
+
                 if (!eventData || ticketError || !ticketType) {
-                    throw new Error('Chyba při načítání dat');
+                    throw new Error('Chyba při načítání dat: ' + (ticketError?.message || 'Event nebo ticket type nenalezen'));
                 }
+
+                // Prepare request data
+                const requestData = {
+                    eventId: eventId,
+                    ticketTypeId: ticketTypeId,
+                    quantity: quantity,
+                    eventName: eventData.title,
+                    ticketTypeName: ticketType.name,
+                    unitPrice: ticketType.price,
+                    totalAmount: ticketType.price * quantity,
+                    successUrl: window.location.origin + window.location.pathname + '?payment=success',
+                    cancelUrl: window.location.origin + window.location.pathname + '?payment=cancelled'
+                };
+
+                console.log('Sending to Edge Function:', requestData);
 
                 // Create Stripe Checkout session
                 const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout-session`, {
@@ -1665,21 +1685,15 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                     },
-                    body: JSON.stringify({
-                        eventId: eventId,
-                        ticketTypeId: ticketTypeId,
-                        quantity: quantity,
-                        eventName: eventData.title,
-                        ticketTypeName: ticketType.name,
-                        unitPrice: ticketType.price,
-                        totalAmount: ticketType.price * quantity,
-                        successUrl: window.location.origin + window.location.pathname + '?payment=success',
-                        cancelUrl: window.location.origin + window.location.pathname + '?payment=cancelled'
-                    })
+                    body: JSON.stringify(requestData)
                 });
 
+                console.log('Response status:', response.status);
+
                 if (!response.ok) {
-                    throw new Error('Chyba při vytváření platby');
+                    const errorText = await response.text();
+                    console.error('Edge Function error:', errorText);
+                    throw new Error('Chyba při vytváření platby: ' + response.status);
                 }
 
                 const session = await response.json();
