@@ -52,15 +52,18 @@ serve(async (req) => {
             break
           }
 
-          // Create tickets
+          // Create tickets with QR codes
           const tickets = []
           for (let i = 0; i < quantity; i++) {
+            const ticketId = crypto.randomUUID()
             tickets.push({
+              id: ticketId,
               ticket_type_id: parseInt(ticketTypeId),
               stripe_payment_id: session.payment_intent as string,
               email: session.customer_email || '',
               status: 'paid',
               purchase_date: new Date().toISOString(),
+              qr_code: ticketId, // QR code contains ticket ID
               metadata: {
                 session_id: session.id,
                 amount: session.amount_total,
