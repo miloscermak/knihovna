@@ -511,6 +511,15 @@
                     </label>
                     <small style="color: var(--gray-medium);">Zapněte pro aktivaci prodeje vstupenek na webu</small>
                 </div>
+                
+                <!-- Quick test toggle for development -->
+                <div class="form-group" style="border: 2px dashed orange; padding: 1rem; border-radius: 8px;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="testTicketSalesToggle" onchange="toggleTestTicketSales()">
+                        <strong style="color: orange;">🧪 TEST: Zapnout prodej pro testování (jen pro aktuální session)</strong>
+                    </label>
+                    <small style="color: orange;">Toto je testovací přepínač - změny se neukládají do databáze</small>
+                </div>
 
                 <!-- Event selection for ticket management -->
                 <div class="form-group">
@@ -1622,6 +1631,21 @@
                 showAlert('danger', 'Chyba při změně nastavení: ' + error.message, 'stripeError');
                 // Revert checkbox
                 document.getElementById('ticketSalesToggle').checked = !isEnabled;
+            }
+        }
+        
+        // Test toggle that bypasses database - for development/testing
+        function toggleTestTicketSales() {
+            const isEnabled = document.getElementById('testTicketSalesToggle').checked;
+            console.log('Test toggle - setting ticket sales to:', isEnabled);
+            
+            // Save to localStorage for main page to read
+            localStorage.setItem('test_ticket_sales_enabled', isEnabled.toString());
+            
+            if (isEnabled) {
+                showAlert('success', '🧪 TEST: Prodej vstupenek je dočasně zapnut! Obnovte hlavní stránku (F5) pro testování.', 'stripeAlert');
+            } else {
+                showAlert('success', '🧪 TEST: Prodej vstupenek je vypnut.', 'stripeAlert');
             }
         }
         
