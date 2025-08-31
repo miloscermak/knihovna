@@ -719,27 +719,41 @@
 
         // Load ticket sales statistics
         async function loadTicketStats() {
+            console.log('Loading ticket statistics...');
             try {
-                // Get total sales statistics
-                const { data: stats, error: statsError } = await supabase
+                // Get tickets first
+                const { data: tickets, error: ticketsError } = await supabase
                     .from('tickets')
-                    .select(`
-                        id,
-                        email,
-                        purchase_date,
-                        status,
-                        ticket_type_id,
-                        ticket_types(name, price, event_id, events(title, date, time))
-                    `)
+                    .select('*')
                     .eq('status', 'paid')
                     .order('purchase_date', { ascending: false });
 
-                if (statsError) throw statsError;
+                if (ticketsError) throw ticketsError;
+
+                // Get ticket types
+                const { data: ticketTypes, error: typesError } = await supabase
+                    .from('ticket_types')
+                    .select('*');
+
+                if (typesError) throw typesError;
+
+                // Get events 
+                const { data: events, error: eventsError } = await supabase
+                    .from('events')
+                    .select('*');
+
+                if (eventsError) throw eventsError;
 
                 // Calculate statistics
-                const totalTickets = stats.length;
-                const totalRevenue = stats.reduce((sum, ticket) => sum + ticket.ticket_types.price, 0);
-                const uniqueEvents = new Set(stats.map(t => t.ticket_types.event_id)).size;
+                const totalTickets = tickets.length;
+                const totalRevenue = tickets.reduce((sum, ticket) => {
+                    const ticketType = ticketTypes.find(tt => tt.id === ticket.ticket_type_id);
+                    return sum + (ticketType ? ticketType.price : 0);
+                }, 0);
+                const uniqueEvents = new Set(tickets.map(t => {
+                    const ticketType = ticketTypes.find(tt => tt.id === t.ticket_type_id);
+                    return ticketType ? ticketType.event_id : null;
+                }).filter(Boolean)).size;
 
                 // Update stats display
                 document.getElementById('ticketStats').innerHTML = `
@@ -758,33 +772,37 @@
                 `;
 
                 // Display recent tickets
-                const recentTickets = stats.slice(0, 10);
+                const recentTickets = tickets.slice(0, 10);
                 document.getElementById('soldTicketsList').innerHTML = `
                     <h4>Nedávno prodané vstupenky</h4>
                     <div class="tickets-list" style="max-height: 300px; overflow-y: auto; background: white; border-radius: 8px; padding: 1rem;">
-                        ${recentTickets.map(ticket => `
-                            <div class="ticket-item" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border-bottom: 1px solid #eee;">
-                                <div>
-                                    <strong>${ticket.ticket_types.events.title}</strong><br>
-                                    <small>${ticket.ticket_types.name} - ${(ticket.ticket_types.price / 100)} Kč</small><br>
-                                    <small style="color: #666;">${ticket.email}</small>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div style="font-size: 0.8rem; color: #666;">
-                                        ${new Date(ticket.purchase_date).toLocaleDateString('cs-CZ')}
+                        ${recentTickets.map(ticket => {
+                            const ticketType = ticketTypes.find(tt => tt.id === ticket.ticket_type_id);
+                            const event = events.find(e => e.id === ticketType?.event_id);
+                            return `
+                                <div class="ticket-item" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border-bottom: 1px solid #eee;">
+                                    <div>
+                                        <strong>${event?.title || 'Neznámá událost'}</strong><br>
+                                        <small>${ticketType?.name || 'Neznámý typ'} - ${ticketType ? (ticketType.price / 100) : 0} Kč</small><br>
+                                        <small style="color: #666;">${ticket.email}</small>
                                     </div>
-                                    <button onclick="showTicketQR('${ticket.id}')" class="btn btn-sm" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">
-                                        QR kód
-                                    </button>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 0.8rem; color: #666;">
+                                            ${new Date(ticket.purchase_date).toLocaleDateString('cs-CZ')}
+                                        </div>
+                                        <button onclick="showTicketQR('${ticket.id}')" class="btn btn-sm" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">
+                                            QR kód
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        `).join('')}
+                            `;
+                        }).join('')}
                     </div>
                 `;
 
             } catch (error) {
                 console.error('Error loading ticket stats:', error);
-                document.getElementById('ticketStats').innerHTML = '<p style="color: red;">Chyba při načítání statistik</p>';
+                document.getElementById('ticketStats').innerHTML = '<p style="color: red;">Chyba při načítání statistik: ' + error.message + '</p>';
             }
         }
 
