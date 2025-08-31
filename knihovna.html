@@ -1755,13 +1755,8 @@
         async function loadTicketSalesSetting() {
             console.log('Loading ticket sales setting from database...');
             
-            // Check for test override first
-            const testOverride = localStorage.getItem('test_ticket_sales_enabled');
-            if (testOverride === 'true') {
-                TICKET_SALES_ENABLED = true;
-                console.log('🧪 TEST MODE: Ticket sales enabled via localStorage override');
-                return;
-            }
+            // Remove any test override for production
+            localStorage.removeItem('test_ticket_sales_enabled');
             
             try {
                 const { data, error } = await supabase
