@@ -1682,31 +1682,34 @@
                 console.log('Sending to Edge Function:', requestData);
 
                 if (USE_PAYMENT_LINKS) {
-                    // Alternative: Use Stripe Payment Links for testing
-                    console.log('Using Payment Link mode for testing');
+                    // Alternative: Simulate payment for testing
+                    console.log('Using test mode - simulating payment');
                     
-                    // Create a test payment link URL
-                    // In production, these would be pre-created in Stripe Dashboard
-                    const testPaymentLinks = {
-                        '250': 'https://buy.stripe.com/test_14k5kC5xQ6Li3Ru000', // Example test link for 250 Kč
-                        '350': 'https://buy.stripe.com/test_28o8wO7FY7Pm4Vy111', // Example test link for 350 Kč
-                        '500': 'https://buy.stripe.com/test_3cs00i9O68TqaBI222'  // Example test link for 500 Kč
-                    };
+                    const confirmPurchase = confirm(
+                        `TESTOVACÍ REŽIM\n\n` +
+                        `Událost: ${eventData.title}\n` +
+                        `Vstupenka: ${ticketType.name}\n` +
+                        `Cena: ${(ticketType.price / 100)} Kč\n` +
+                        `Počet: ${quantity}\n` +
+                        `Celkem: ${(ticketType.price * quantity / 100)} Kč\n\n` +
+                        `Klikněte OK pro simulaci úspěšné platby, Cancel pro zrušení.`
+                    );
                     
-                    const priceKey = (ticketType.price / 100).toString();
-                    let paymentUrl = testPaymentLinks[priceKey];
-                    
-                    if (!paymentUrl) {
-                        // For testing: Show info about creating payment link
-                        console.log('No payment link for price:', priceKey);
-                        alert(`Pro testování: Vytvořte Payment Link pro cenu ${priceKey} Kč v Stripe Dashboard.\n\nPro ostré spuštění bude potřeba opravit Edge Function.`);
+                    if (confirmPurchase) {
+                        // Simulate successful payment
+                        console.log('Simulating successful payment');
+                        button.innerHTML = 'Platba úspěšná!';
+                        setTimeout(() => {
+                            showPaymentSuccess();
+                            button.innerHTML = 'Koupit';
+                            button.disabled = false;
+                        }, 1000);
+                    } else {
+                        // Simulate cancelled payment
+                        console.log('Payment cancelled by user');
+                        showPaymentCancelled();
                         button.innerHTML = 'Koupit';
                         button.disabled = false;
-                        return;
-                    } else {
-                        // Redirect to payment link
-                        console.log('Redirecting to payment link:', paymentUrl);
-                        window.location.href = paymentUrl;
                     }
                     
                 } else {
