@@ -607,6 +607,9 @@
         // Initialize Stripe - TODO: Replace with actual publishable key when ready for production
         const stripe = Stripe('pk_test_51QaHoKRw2M8c2eL6v4bZyGXzYvNXTqMHUoIjXwJDrE7BF1xKHXLKHFjRGvRmKXzYvNXTqMHUoIjXwJDrE7BF1xK');
         
+        // Test mode flag - use Payment Links instead of Checkout Session
+        const USE_PAYMENT_LINKS = true;
+        
         // Ticket sales flag - loaded from database
         let TICKET_SALES_ENABLED = false;
         
@@ -1678,33 +1681,63 @@
 
                 console.log('Sending to Edge Function:', requestData);
 
-                // Create Stripe Checkout session
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout-session`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    },
-                    body: JSON.stringify(requestData)
-                });
+                if (USE_PAYMENT_LINKS) {
+                    // Alternative: Use Stripe Payment Links for testing
+                    console.log('Using Payment Link mode for testing');
+                    
+                    // Create a test payment link URL
+                    // In production, these would be pre-created in Stripe Dashboard
+                    const testPaymentLinks = {
+                        '250': 'https://buy.stripe.com/test_14k5kC5xQ6Li3Ru000', // Example test link for 250 Kč
+                        '350': 'https://buy.stripe.com/test_28o8wO7FY7Pm4Vy111', // Example test link for 350 Kč
+                        '500': 'https://buy.stripe.com/test_3cs00i9O68TqaBI222'  // Example test link for 500 Kč
+                    };
+                    
+                    const priceKey = (ticketType.price / 100).toString();
+                    let paymentUrl = testPaymentLinks[priceKey];
+                    
+                    if (!paymentUrl) {
+                        // For testing: Show info about creating payment link
+                        console.log('No payment link for price:', priceKey);
+                        alert(`Pro testování: Vytvořte Payment Link pro cenu ${priceKey} Kč v Stripe Dashboard.\n\nPro ostré spuštění bude potřeba opravit Edge Function.`);
+                        button.innerHTML = 'Koupit';
+                        button.disabled = false;
+                        return;
+                    } else {
+                        // Redirect to payment link
+                        console.log('Redirecting to payment link:', paymentUrl);
+                        window.location.href = paymentUrl;
+                    }
+                    
+                } else {
+                    // Original Edge Function approach
+                    const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout-session`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                        },
+                        body: JSON.stringify(requestData)
+                    });
 
-                console.log('Response status:', response.status);
+                    console.log('Response status:', response.status);
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Edge Function error:', errorText);
-                    throw new Error('Chyba při vytváření platby: ' + response.status);
-                }
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('Edge Function error:', errorText);
+                        throw new Error('Chyba při vytváření platby: ' + response.status);
+                    }
 
-                const session = await response.json();
+                    const session = await response.json();
 
-                // Redirect to Stripe Checkout
-                const result = await stripe.redirectToCheckout({
-                    sessionId: session.sessionId
-                });
+                    // Redirect to Stripe Checkout
+                    const result = await stripe.redirectToCheckout({
+                        sessionId: session.sessionId
+                    });
 
-                if (result.error) {
-                    throw new Error(result.error.message);
+                    if (result.error) {
+                        throw new Error(result.error.message);
+                    }
                 }
 
             } catch (error) {
