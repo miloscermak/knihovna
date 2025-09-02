@@ -1354,6 +1354,9 @@
                 return;
             }
             
+            // Update URL hash for sharing
+            window.history.pushState(null, null, `#udalost/${eventId}`);
+            
             const eventDate = new Date(event.date);
             const formattedDate = eventDate.toLocaleDateString('cs-CZ', { 
                 weekday: 'long', 
@@ -1423,6 +1426,9 @@
         function closeEventDetail() {
             document.getElementById('eventModal').classList.add('hidden');
             document.body.style.overflow = 'auto';
+            
+            // Clear URL hash
+            window.history.pushState(null, null, window.location.pathname);
         }
         
         // Close modal when clicking outside
@@ -1642,11 +1648,32 @@
             }
         }
         
+        // Handle URL routing for event sharing
+        function handleHashChange() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#udalost/')) {
+                const eventId = parseInt(hash.replace('#udalost/', ''));
+                if (eventId && events.length > 0) {
+                    showEventDetail(eventId);
+                }
+            }
+        }
+        
+        // Listen for hash changes
+        window.addEventListener('hashchange', handleHashChange);
+        
         // Start the app when DOM is loaded
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initApp);
+            document.addEventListener('DOMContentLoaded', async () => {
+                await initApp();
+                // Check if URL has event hash after loading
+                handleHashChange();
+            });
         } else {
-            initApp();
+            initApp().then(() => {
+                // Check if URL has event hash after loading
+                handleHashChange();
+            });
         }
 
         // Auto-refresh data every 15 seconds
