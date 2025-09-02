@@ -750,6 +750,7 @@
                 }
 
                 console.log('Sample ticket data:', tickets[0]);
+                console.log('Tickets query result:', tickets, 'Error:', ticketsError);
 
                 // Get all tickets
                 const { data: allTickets, error: allTicketsError } = await supabase
