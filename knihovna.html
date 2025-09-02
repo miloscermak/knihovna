@@ -1399,13 +1399,14 @@
                     
                     <div class="border-t pt-6">
                         ${event.shopLink || EXTERNAL_TICKET_URL ? `
-                            <a href="${event.shopLink || EXTERNAL_TICKET_URL}" target="_blank" rel="noopener noreferrer" class="inline-block bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700 transition-colors duration-200 mr-4">
+                            <a href="${event.shopLink || EXTERNAL_TICKET_URL}" target="_blank" rel="noopener noreferrer" class="inline-block bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700 transition-colors duration-200">
                                 🎫 Koupit vstupenky
                             </a>
-                        ` : ''}
-                        <span class="inline-block bg-gray-600 text-white px-8 py-3 rounded-lg font-bold">
-                            ${event.buttonText || 'ℹ️ Více info na místě'}
-                        </span>
+                        ` : `
+                            <span class="inline-block bg-gray-600 text-white px-8 py-3 rounded-lg font-bold">
+                                ${event.buttonText || 'ℹ️ Více info na místě'}
+                            </span>
+                        `}
                         <div class="mt-4 text-sm text-gray-500">
                             <p>📍 ${currentAddress}</p>
                             <p class="mt-1">Kapacita: 50 míst</p>
