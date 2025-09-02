@@ -721,14 +721,43 @@
         async function loadTicketStats() {
             console.log('Loading ticket statistics...');
             try {
-                // Get tickets first
+                // First check what columns exist in tickets table
                 const { data: tickets, error: ticketsError } = await supabase
                     .from('tickets')
                     .select('*')
                     .eq('status', 'paid')
-                    .order('created_at', { ascending: false });
+                    .limit(1);
 
-                if (ticketsError) throw ticketsError;
+                if (ticketsError) {
+                    console.log('Tickets table error:', ticketsError);
+                    // Maybe no tickets exist yet
+                    document.getElementById('ticketStats').innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">Prodaných vstupenek</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">0 Kč</div>
+                            <div class="stat-label">Celkový příjem</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">Události s prodejem</div>
+                        </div>
+                    `;
+                    document.getElementById('soldTicketsList').innerHTML = '<h4>Žádné prodané vstupenky</h4>';
+                    return;
+                }
+
+                console.log('Sample ticket data:', tickets[0]);
+
+                // Get all tickets
+                const { data: allTickets, error: allTicketsError } = await supabase
+                    .from('tickets')
+                    .select('*')
+                    .eq('status', 'paid');
+
+                if (allTicketsError) throw allTicketsError;
 
                 // Get ticket types
                 const { data: ticketTypes, error: typesError } = await supabase
@@ -744,13 +773,13 @@
 
                 if (eventsError) throw eventsError;
 
-                // Calculate statistics
-                const totalTickets = tickets.length;
-                const totalRevenue = tickets.reduce((sum, ticket) => {
+                // Calculate statistics using allTickets
+                const totalTickets = allTickets.length;
+                const totalRevenue = allTickets.reduce((sum, ticket) => {
                     const ticketType = ticketTypes.find(tt => tt.id === ticket.ticket_type_id);
                     return sum + (ticketType ? ticketType.price : 0);
                 }, 0);
-                const uniqueEvents = new Set(tickets.map(t => {
+                const uniqueEvents = new Set(allTickets.map(t => {
                     const ticketType = ticketTypes.find(tt => tt.id === t.ticket_type_id);
                     return ticketType ? ticketType.event_id : null;
                 }).filter(Boolean)).size;
@@ -772,7 +801,7 @@
                 `;
 
                 // Display recent tickets
-                const recentTickets = tickets.slice(0, 10);
+                const recentTickets = allTickets.slice(0, 10);
                 document.getElementById('soldTicketsList').innerHTML = `
                     <h4>Nedávno prodané vstupenky</h4>
                     <div class="tickets-list" style="max-height: 300px; overflow-y: auto; background: white; border-radius: 8px; padding: 1rem;">
