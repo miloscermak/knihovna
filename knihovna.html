@@ -607,11 +607,8 @@
         // Initialize Stripe - TODO: Replace with actual publishable key when ready for production
         const stripe = Stripe('pk_live_51PtBjpHaBu0y0SYT8Yp5eOWwB8fu2BG7KNWaPJPHh2PpfR2kqQrDpyDXtmYXQzfDWCZ4FBjaSGilELdOxo7OwjLi001lXPezb1');
         
-        // Test mode flag - use Payment Links instead of Checkout Session
-        const USE_PAYMENT_LINKS = false;
-        
-        // Ticket sales flag - loaded from database
-        let TICKET_SALES_ENABLED = true;
+        // External ticket sales URL
+        let EXTERNAL_TICKET_URL = '';
         
         // Initialize data storage
         let events = [];
@@ -1438,9 +1435,9 @@
             document.getElementById('eventModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             
-            // Load ticket types if sales are enabled
-            if (TICKET_SALES_ENABLED) {
-                loadTicketTypes(event.id);
+            // Show external ticket button if URL is set
+            if (EXTERNAL_TICKET_URL) {
+                showExternalTicketButton(event.id);
             }
         }
         
@@ -1546,9 +1543,21 @@
         window.addEventListener('hashchange', handleHashChange);
         window.addEventListener('load', handleHashChange);
 
-        // Ticket management functions
-        async function loadTicketTypes(eventId) {
-            console.log('loadTicketTypes called for event:', eventId, 'Sales enabled:', TICKET_SALES_ENABLED);
+        // Show external ticket button
+        function showExternalTicketButton(eventId) {
+            const ticketSection = document.getElementById(`ticket-section-${eventId}`);
+            if (ticketSection) {
+                ticketSection.innerHTML = `
+                    <div class="p-6 border-t border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">🎫 Vstupenky</h3>
+                        <a href="${EXTERNAL_TICKET_URL}" target="_blank" rel="noopener noreferrer" 
+                           class="inline-block bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                            Koupit vstupenky
+                        </a>
+                    </div>
+                `;
+            }
+        }
             
             if (!TICKET_SALES_ENABLED) {
                 console.log('Ticket sales disabled, not loading tickets');
@@ -1751,37 +1760,20 @@
             }
         }
 
-        // Load ticket sales setting from database
-        async function loadTicketSalesSetting() {
-            console.log('Loading ticket sales setting from database...');
-            
-            // Remove any test override for production
-            localStorage.removeItem('test_ticket_sales_enabled');
-            
+        // Load external ticket URL from database
+        async function loadExternalTicketUrl() {
             try {
                 const { data, error } = await supabase
                     .from('settings')
                     .select('*')
-                    .eq('key', 'ticket_sales_enabled');
+                    .eq('key', 'external_ticket_url');
                 
-                console.log('Settings query result:', data, error);
-                
-                if (error) {
-                    console.error('Error loading ticket sales setting:', error);
-                    TICKET_SALES_ENABLED = false;
-                    return;
-                }
-                
-                if (data && data.length > 0) {
-                    TICKET_SALES_ENABLED = data[0].value === 'true';
-                    console.log('Ticket sales setting loaded:', data[0].value, '-> enabled:', TICKET_SALES_ENABLED);
-                } else {
-                    console.log('No ticket sales setting found, defaulting to false');
-                    TICKET_SALES_ENABLED = false;
+                if (!error && data && data.length > 0) {
+                    EXTERNAL_TICKET_URL = data[0].value || '';
+                    console.log('External ticket URL loaded:', EXTERNAL_TICKET_URL);
                 }
             } catch (error) {
-                console.error('Exception loading ticket sales setting:', error);
-                TICKET_SALES_ENABLED = false;
+                console.error('Error loading external ticket URL:', error);
             }
         }
 
@@ -2017,7 +2009,7 @@
         async function initApp() {
             await loadEvents();
             await loadAllContent();
-            await loadTicketSalesSetting();
+            await loadExternalTicketUrl();
             await loadGalleryImages();
             await loadInstagramPhotos();
             if (typeof renderEventList === 'function') {

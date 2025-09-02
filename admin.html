@@ -496,79 +496,23 @@
             <!-- Newsletter Subscribers -->
             <!-- Stripe Payment Management -->
             <div class="section">
-                <h2>🎫 Správa prodeje vstupenek</h2>
+                <h2>🎫 Externí prodej vstupenek</h2>
                 <div class="alert alert-info">
-                    <p>Zde můžete zapnout/vypnout prodej vstupenek a spravovat typy vstupenek pro jednotlivé události.</p>
+                    <p>Nastavte odkaz na externí službu pro prodej vstupenek (např. GoOut, Ticketmaster, apod.)</p>
                 </div>
-                <div class="alert alert-success" id="stripeAlert" style="display: none;"></div>
-                <div class="alert alert-danger" id="stripeError" style="display: none;"></div>
+                <div class="alert alert-success" id="ticketAlert" style="display: none;"></div>
+                <div class="alert alert-danger" id="ticketError" style="display: none;"></div>
                 
-                <!-- Toggle ticket sales -->
+                <!-- External ticket URL -->
                 <div class="form-group">
-                    <label style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="ticketSalesToggle" onchange="toggleTicketSales()">
-                        <strong>Povolit prodej vstupenek (Stripe)</strong>
-                    </label>
-                    <small style="color: var(--gray-medium);">Zapněte pro aktivaci prodeje vstupenek na webu</small>
+                    <label for="externalTicketUrl"><strong>URL pro prodej vstupenek:</strong></label>
+                    <input type="url" id="externalTicketUrl" placeholder="https://example.com/vstupenky" 
+                           class="form-control" style="width: 100%; padding: 0.75rem;">
+                    <small style="color: var(--gray-medium);">Zadejte kompletní URL včetně https://</small>
                 </div>
-                
-                <!-- Ticket Sales Statistics -->
-                <div class="section">
-                    <h3>📊 Statistiky prodeje</h3>
-                    <div id="ticketStats" class="grid grid-cols-3 gap-4 mb-4">
-                        <!-- Stats will be loaded here -->
-                    </div>
-                    <div id="soldTicketsList">
-                        <!-- Sold tickets list will be loaded here -->
-                    </div>
-                </div>
-                
-                <!-- Quick test toggle for development -->
-                <div class="form-group" style="border: 2px dashed orange; padding: 1rem; border-radius: 8px;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="testTicketSalesToggle" onchange="toggleTestTicketSales()">
-                        <strong style="color: orange;">🧪 TEST: Zapnout prodej pro testování (jen pro aktuální session)</strong>
-                    </label>
-                    <small style="color: orange;">Toto je testovací přepínač - změny se neukládají do databáze</small>
-                </div>
-
-                <!-- Event selection for ticket management -->
-                <div class="form-group">
-                    <label for="eventSelectTickets">Vyberte událost pro správu vstupenek:</label>
-                    <select id="eventSelectTickets" onchange="loadEventTicketTypes()" class="form-control">
-                        <option value="">-- Vyberte událost --</option>
-                    </select>
-                </div>
-
-                <!-- Ticket types for selected event -->
-                <div id="ticketTypesContainer" style="display: none;">
-                    <h3>Typy vstupenek</h3>
-                    <div id="ticketTypesList"></div>
-                    
-                    <!-- Add new ticket type -->
-                    <div style="border: 2px dashed var(--gray-medium); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
-                        <h4>Přidat nový typ vstupenky</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label for="ticketName">Název</label>
-                                <input type="text" id="ticketName" placeholder="např. Standardní, VIP, Student" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="ticketPrice">Cena (Kč)</label>
-                                <input type="number" id="ticketPrice" placeholder="250" class="form-control" min="0">
-                            </div>
-                            <div class="form-group">
-                                <label for="ticketMaxQuantity">Maximální počet</label>
-                                <input type="number" id="ticketMaxQuantity" placeholder="50" class="form-control" min="1">
-                            </div>
-                            <div class="form-group">
-                                <label for="ticketDescription">Popis (volitelný)</label>
-                                <input type="text" id="ticketDescription" placeholder="Popis typu vstupenky" class="form-control">
-                            </div>
-                        </div>
-                        <button type="button" onclick="addTicketType()" class="btn btn-primary">Přidat typ vstupenky</button>
-                    </div>
-                </div>
+                <button onclick="saveExternalTicketUrl()" class="btn btn-primary">
+                    Uložit URL
+                </button>
             </div>
 
             <div class="section">
@@ -1707,8 +1651,7 @@
             await loadSubscribers();
             loadGalleryImages();
             await loadInstagramPhotos();
-            await initStripeManagement();
-            await loadTicketStats();
+            await initExternalTicketUrl();
             updateStats();
         }
 
@@ -1740,51 +1683,44 @@
         }
         
         // Stripe ticket management functions
-        async function initStripeManagement() {
-            // Load current ticket sales status
-            await loadTicketSalesStatus();
-            
-            // Populate event select for ticket management
-            await populateEventSelectForTickets();
+        async function initExternalTicketUrl() {
+            // Load current external ticket URL
+            await loadExternalTicketUrlSetting();
         }
         
-        async function loadTicketSalesStatus() {
+        async function loadExternalTicketUrlSetting() {
             try {
                 const { data, error } = await supabase
                     .from('settings')
                     .select('*')
-                    .eq('key', 'ticket_sales_enabled');
+                    .eq('key', 'external_ticket_url');
                     
-                const ticketSalesToggle = document.getElementById('ticketSalesToggle');
+                const urlInput = document.getElementById('externalTicketUrl');
                 if (error) {
                     console.log('Settings table error:', error);
-                    ticketSalesToggle.checked = false;
                     return;
                 }
                 
                 if (data && data.length > 0) {
-                    ticketSalesToggle.checked = data[0].value === 'true';
-                } else {
-                    ticketSalesToggle.checked = false;
+                    urlInput.value = data[0].value || '';
                 }
             } catch (error) {
-                console.log('Ticket sales status not found, defaulting to disabled:', error);
-                document.getElementById('ticketSalesToggle').checked = false;
+                console.log('External ticket URL loading error:', error);
             }
         }
         
-        async function toggleTicketSales() {
+        async function saveExternalTicketUrl() {
             if (!isAuthenticated) return;
             
-            const isEnabled = document.getElementById('ticketSalesToggle').checked;
-            console.log('Toggling ticket sales to:', isEnabled);
+            const url = document.getElementById('externalTicketUrl').value.trim();
+            console.log('Saving external ticket URL:', url);
             
             try {
                 const { data, error } = await supabase
                     .from('settings')
                     .upsert([{
-                        key: 'ticket_sales_enabled',
-                        value: isEnabled.toString()
+                        key: 'external_ticket_url',
+                        value: url
                     }], {
                         onConflict: 'key'
                     })
@@ -1795,27 +1731,15 @@
                     throw error;
                 }
                 
-                console.log('Settings upserted successfully:', data);
-                
-                showAlert('success', `Prodej vstupenek byl ${isEnabled ? 'zapnut' : 'vypnut'}.`, 'stripeAlert');
-                
-                // Inform user about refresh needed
-                if (isEnabled) {
-                    showAlert('success', 'Prodej vstupenek je aktivní! Obnovte hlavní stránku (F5) aby se změna projevila.', 'stripeAlert');
-                } else {
-                    showAlert('success', 'Prodej vstupenek je vypnut. Obnovte hlavní stránku (F5) aby se změna projevila.', 'stripeAlert');
-                }
+                console.log('External ticket URL saved successfully:', data);
+                showAlert('success', url ? 'URL pro prodej vstupenek bylo uloženo. Obnovte hlavní stránku (F5) aby se změna projevila.' : 'URL bylo odstraněno.', 'ticketAlert');
                 
             } catch (error) {
-                console.error('Error toggling ticket sales:', error);
-                showAlert('danger', 'Chyba při změně nastavení: ' + error.message, 'stripeError');
-                // Revert checkbox
-                document.getElementById('ticketSalesToggle').checked = !isEnabled;
+                console.error('Error saving external ticket URL:', error);
+                showAlert('danger', 'Chyba při ukládání URL: ' + error.message, 'ticketError');
             }
         }
         
-        // Test toggle that bypasses database - for development/testing
-        function toggleTestTicketSales() {
             const isEnabled = document.getElementById('testTicketSalesToggle').checked;
             console.log('Test toggle - setting ticket sales to:', isEnabled);
             
