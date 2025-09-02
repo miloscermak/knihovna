@@ -721,16 +721,32 @@
         async function loadTicketStats() {
             console.log('Loading ticket statistics...');
             try {
-                // First check what columns exist in tickets table
-                const { data: tickets, error: ticketsError } = await supabase
+                // First check if tickets table exists
+                const { data: allTickets, error: checkError } = await supabase
                     .from('tickets')
-                    .select('*')
-                    .eq('status', 'paid')
-                    .limit(1);
+                    .select('*');
+                
+                console.log('All tickets query:', allTickets, 'Error:', checkError);
+                
+                if (checkError) {
+                    console.error('Tickets table error:', checkError);
+                    // Table might not exist
+                    document.getElementById('ticketStats').innerHTML = `
+                        <div class="alert alert-danger">
+                            <p>Tabulka tickets neexistuje nebo není přístupná.</p>
+                            <p>Error: ${checkError.message}</p>
+                        </div>
+                    `;
+                    document.getElementById('soldTicketsList').innerHTML = '';
+                    return;
+                }
+                
+                // Filter paid tickets
+                const tickets = allTickets ? allTickets.filter(t => t.status === 'paid') : [];
 
-                if (ticketsError) {
-                    console.log('Tickets table error:', ticketsError);
-                    // Maybe no tickets exist yet
+                console.log('Paid tickets:', tickets);
+
+                if (tickets.length === 0) {
                     document.getElementById('ticketStats').innerHTML = `
                         <div class="stat-card">
                             <div class="stat-number">0</div>
@@ -749,17 +765,6 @@
                     return;
                 }
 
-                console.log('Sample ticket data:', tickets[0]);
-                console.log('Tickets query result:', tickets, 'Error:', ticketsError);
-
-                // Get all tickets
-                const { data: allTickets, error: allTicketsError } = await supabase
-                    .from('tickets')
-                    .select('*')
-                    .eq('status', 'paid');
-
-                if (allTicketsError) throw allTicketsError;
-
                 // Get ticket types
                 const { data: ticketTypes, error: typesError } = await supabase
                     .from('ticket_types')
@@ -774,13 +779,13 @@
 
                 if (eventsError) throw eventsError;
 
-                // Calculate statistics using allTickets
-                const totalTickets = allTickets.length;
-                const totalRevenue = allTickets.reduce((sum, ticket) => {
+                // Calculate statistics using tickets (paid only)
+                const totalTickets = tickets.length;
+                const totalRevenue = tickets.reduce((sum, ticket) => {
                     const ticketType = ticketTypes.find(tt => tt.id === ticket.ticket_type_id);
                     return sum + (ticketType ? ticketType.price : 0);
                 }, 0);
-                const uniqueEvents = new Set(allTickets.map(t => {
+                const uniqueEvents = new Set(tickets.map(t => {
                     const ticketType = ticketTypes.find(tt => tt.id === t.ticket_type_id);
                     return ticketType ? ticketType.event_id : null;
                 }).filter(Boolean)).size;
@@ -802,7 +807,7 @@
                 `;
 
                 // Display recent tickets
-                const recentTickets = allTickets.slice(0, 10);
+                const recentTickets = tickets.slice(0, 10);
                 document.getElementById('soldTicketsList').innerHTML = `
                     <h4>Nedávno prodané vstupenky</h4>
                     <div class="tickets-list" style="max-height: 300px; overflow-y: auto; background: white; border-radius: 8px; padding: 1rem;">
