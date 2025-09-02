@@ -727,6 +727,9 @@
                     .select('*');
                 
                 console.log('All tickets query:', allTickets, 'Error:', checkError);
+                if (allTickets && allTickets.length > 0) {
+                    console.log('Ticket statuses:', allTickets.map(t => ({ id: t.id, status: t.status })));
+                }
                 
                 if (checkError) {
                     console.error('Tickets table error:', checkError);
