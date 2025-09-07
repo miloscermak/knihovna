@@ -700,17 +700,9 @@
             } catch (error) {
                 console.error('Error loading events:', error);
                 
-                // Fallback to localStorage
-                const localEvents = localStorage.getItem('events');
-                if (localEvents) {
-                    events = JSON.parse(localEvents);
-                    renderEvents();
-                    console.log('Načteny události z localStorage');
-                } else {
-                    events = [];
-                    renderEvents();
-                    showAlert('danger', 'Chyba při načítání událostí: ' + (error.message || 'Neznámá chyba'), 'eventError');
-                }
+                events = [];
+                renderEvents();
+                showAlert('danger', 'Chyba při načítání událostí: ' + (error.message || 'Neznámá chyba'), 'eventError');
             }
         }
         
@@ -966,7 +958,7 @@
                         .eq('id', id);
                         
                     if (error) {
-                        console.log('Supabase delete failed, but localStorage updated:', error);
+                        console.log('Supabase delete failed:', error);
                     }
                     
                     await loadEvents();
@@ -1047,7 +1039,7 @@
 
         // About text management
         function loadAboutText() {
-            const savedAboutText = localStorage.getItem('aboutText');
+            // About text loaded from Supabase only
             const aboutTextarea = document.getElementById('aboutText');
             
             if (savedAboutText) {
