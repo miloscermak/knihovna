@@ -805,21 +805,26 @@
             // Show only first 12 images (3 rows of 4)
             const limitedImages = galleryImages.slice(0, 12);
             
-            let galleryHtml = limitedImages.map(image => `
+            let galleryHtml = limitedImages.map(image => {
+                // Add Cloudinary f_auto transformation for automatic format conversion (HEIC -> JPEG/WebP)
+                const imageUrl = image.url && image.url.includes('cloudinary.com')
+                    ? image.url.replace('/upload/', '/upload/f_auto/')
+                    : image.url;
+                return `
                 <div class="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <img 
-                        src="${image.url}" 
+                    <img
+                        src="${imageUrl}"
                         alt="${image.description}"
                         class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                         onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 400 300\\'><rect fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' text-anchor=\\'middle\\' font-size=\\'20\\' fill=\\'%23999\\'>Obrázek nenalezen</text></svg>'"
-                    >
+                    >`
                     <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
                         <div class="p-4 text-white">
                             <h3 class="text-lg font-semibold">${image.description}</h3>
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
             
             // Add "Show all photos" button if there are more than 12 photos
             if (galleryImages.length > 12) {
