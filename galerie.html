@@ -237,17 +237,26 @@
             }
         }
 
+        // Helper: Add Cloudinary f_auto transformation for automatic format conversion (HEIC -> JPEG/WebP)
+        function getOptimizedUrl(url) {
+            if (url && url.includes('cloudinary.com')) {
+                return url.replace('/upload/', '/upload/f_auto/');
+            }
+            return url;
+        }
+
         // Render gallery
         function renderGallery() {
             const galleryGrid = document.getElementById('galleryGrid');
-            
+
             const newPhotosHtml = displayedPhotos.slice(displayedPhotos.length - PHOTOS_PER_LOAD).map((photo, index) => {
                 const actualIndex = displayedPhotos.length - PHOTOS_PER_LOAD + index;
                 const date = new Date(photo.created_at || photo.date).toLocaleDateString('cs-CZ');
-                
+                const imageUrl = getOptimizedUrl(photo.url);
+
                 return `
                     <div class="gallery-item" onclick="openPhotoModal(${actualIndex})">
-                        <img src="${photo.url}" alt="${photo.description || 'Fotka z knihovny'}" 
+                        <img src="${imageUrl}" alt="${photo.description || 'Fotka z knihovny'}" 
                              onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full bg-gray-700 flex items-center justify-center text-gray-400\\'>📷<br>Fotka se nenačetla</div>'">
                         <div class="overlay">
                             <p class="text-sm font-medium">${photo.description || 'Fotka z knihovny'}</p>
@@ -273,8 +282,9 @@
         function openPhotoModal(index) {
             currentPhotoIndex = index;
             const photo = displayedPhotos[index];
-            
-            document.getElementById('modalImage').src = photo.url;
+            const imageUrl = getOptimizedUrl(photo.url);
+
+            document.getElementById('modalImage').src = imageUrl;
             document.getElementById('modalImage').alt = photo.description || 'Fotka z knihovny';
             
             const date = new Date(photo.created_at || photo.date).toLocaleDateString('cs-CZ');
